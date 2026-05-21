@@ -90,7 +90,11 @@ Exemplo de configuração no `application.properties`:
 
 ---
 POSTMAN
-[Uploading ClyvoVet_API.postman_collection.json…]()
+
+A collection do Postman contendo todos os endpoints da aplicação pode ser acessada abaixo:
+
+- [Collection Postman](https://rm561802-3342259.postman.co/workspace/Maria-Luiza's-Workspace~ac5f82b0-f3ee-4446-8623-b6750534d59b/collection/55091734-6fa414e0-7523-4c60-811e-ff657fd5dae6?action=share&source=copy-link&creator=55091734)
+
 
 
 ```properties
