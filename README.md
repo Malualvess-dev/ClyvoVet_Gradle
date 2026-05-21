@@ -88,6 +88,11 @@ A persistência dos dados é feita com Spring Data JPA e Hibernate.
 
 Exemplo de configuração no `application.properties`:
 
+---
+POSTMAN
+[Uploading ClyvoVet_API.postman_collection.json…]()
+
+
 ```properties
 spring.datasource.url=jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL
 spring.datasource.username=SERA ENVIADO PARA O PROFESSOR
