@@ -1,0 +1,51 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: clyvovet-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: Fiap@2tds2026
+      MYSQL_DATABASE: clyvovet
+      MYSQL_USER: clyvovet_fiap
+      MYSQL_PASSWORD: clyvoVet@fiap2026
+    ports:
+      - "3306:3306"
+    volumes:
+      - clyvovet-mysql-data:/var/lib/mysql
+    networks:
+      - clyvovet-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pFiap@2tds2026"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    image: jounax/clyvovet-api:v1
+    container_name: clyvovet-api
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/clyvovet
+      SPRING_DATASOURCE_USERNAME: clyvovet_fiap
+      SPRING_DATASOURCE_PASSWORD: clyvoVet@fiap2026
+      JAVA_OPTS: "-Dserver.port=8080"
+    volumes:
+      - clyvovet-app-logs:/app/logs
+    networks:
+      - clyvovet-network
+
+volumes:
+  clyvovet-mysql-data:
+    name: clyvovet-mysql-data
+
+  clyvovet-app-logs:
+    name: clyvovet-app-logs
+
+networks:
+  clyvovet-network:
+    driver: bridge
