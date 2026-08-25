@@ -1,6 +1,7 @@
 package br.com.fiap.clyvovet.controller;
 
 import br.com.fiap.clyvovet.dto.request.EstadoRequest;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.EstadoResponse;
 import br.com.fiap.clyvovet.model.Estado;
 import br.com.fiap.clyvovet.service.EstadoService;
@@ -28,14 +29,14 @@ public class EstadoController {
 
     @Operation(summary = "Cria um novo estado")
     @PostMapping
-    public ResponseEntity<EstadoResponse> createEstado(
+    public ResponseEntity<ApiResponse> createEstado(
             @Valid @RequestBody EstadoRequest estadoRequest
     ) {
 
-        EstadoResponse estadoSalvo = estadoService.create(estadoRequest);
+        estadoService.create(estadoRequest);
 
         return new ResponseEntity<>(
-                estadoSalvo,
+                new ApiResponse("Estado cadastrado com sucesso"),
                 HttpStatus.CREATED
         );
     }
