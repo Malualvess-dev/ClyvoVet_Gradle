@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.controller;
 
 
 import br.com.fiap.clyvovet.dto.request.NotificacaoRequest;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.NotificacaoResponse;
 import br.com.fiap.clyvovet.service.NotificacaoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,8 +25,16 @@ public class NotificacaoController {
 
     @Operation(summary = "Cria uma nova notificação")
     @PostMapping
-    public ResponseEntity<NotificacaoResponse> createNotificacao(@Valid @RequestBody NotificacaoRequest notificacaoRequest) {
-        return new ResponseEntity<>(notificacaoService.create(notificacaoRequest), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse> createNotificacao(
+            @Valid @RequestBody NotificacaoRequest notificacaoRequest
+    ) {
+
+        notificacaoService.create(notificacaoRequest);
+
+        return new ResponseEntity<>(
+                new ApiResponse("Notificação cadastrada com sucesso"),
+                HttpStatus.CREATED
+        );
     }
 
     @Operation(summary = "Busca notificação por id")

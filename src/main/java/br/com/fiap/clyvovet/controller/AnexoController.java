@@ -3,6 +3,7 @@ package br.com.fiap.clyvovet.controller;
 
 import br.com.fiap.clyvovet.dto.request.AnexoRequest;
 import br.com.fiap.clyvovet.dto.response.AnexoResponse;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.model.TipoArquivo;
 import br.com.fiap.clyvovet.service.AnexoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,8 +27,16 @@ public class AnexoController {
 
     @Operation(summary = "Cria um novo anexo")
     @PostMapping
-    public ResponseEntity<AnexoResponse> createAnexo(@Valid @RequestBody AnexoRequest anexoRequest) {
-        return new ResponseEntity<>(anexoService.create(anexoRequest), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse> createAnexo(
+            @Valid @RequestBody AnexoRequest anexoRequest
+    ) {
+
+        anexoService.create(anexoRequest);
+
+        return new ResponseEntity<>(
+                new ApiResponse("Anexo cadastrado com sucesso"),
+                HttpStatus.CREATED
+        );
     }
 
     @Operation(summary = "Busca anexo por id")

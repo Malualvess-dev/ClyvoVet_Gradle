@@ -3,6 +3,7 @@ package br.com.fiap.clyvovet.controller;
 
 import br.com.fiap.clyvovet.dto.request.AgendaRequest;
 import br.com.fiap.clyvovet.dto.response.AgendaResponse;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.service.AgendaService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -28,8 +29,16 @@ public class AgendaController {
 
     @Operation(summary = "Cria uma nova agenda")
     @PostMapping
-    public ResponseEntity<AgendaResponse> createAgenda(@Valid @RequestBody AgendaRequest agendaRequest) {
-        return new ResponseEntity<>(agendaService.create(agendaRequest), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse> createAgenda(
+            @Valid @RequestBody AgendaRequest agendaRequest
+    ) {
+
+        agendaService.create(agendaRequest);
+
+        return new ResponseEntity<>(
+                new ApiResponse("Agenda cadastrada com sucesso"),
+                HttpStatus.CREATED
+        );
     }
 
     @Operation(summary = "Busca agenda por id")

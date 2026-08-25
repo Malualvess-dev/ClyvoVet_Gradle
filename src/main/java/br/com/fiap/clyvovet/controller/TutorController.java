@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.controller;
 
 
 import br.com.fiap.clyvovet.dto.request.TutorRequest;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.TutorResponse;
 import br.com.fiap.clyvovet.service.TutorService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,8 +26,16 @@ public class TutorController {
 
     @Operation(summary = "Cria um novo tutor")
     @PostMapping
-    public ResponseEntity<TutorResponse> createTutor(@Valid @RequestBody TutorRequest tutorRequest) {
-        return new ResponseEntity<>(tutorService.create(tutorRequest), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse> createTutor(
+            @Valid @RequestBody TutorRequest tutorRequest
+    ) {
+
+        tutorService.create(tutorRequest);
+
+        return new ResponseEntity<>(
+                new ApiResponse("Tutor cadastrado com sucesso"),
+                HttpStatus.CREATED
+        );
     }
 
     @Operation(summary = "Busca tutor por id")

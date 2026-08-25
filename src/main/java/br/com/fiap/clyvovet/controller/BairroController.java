@@ -1,6 +1,7 @@
 package br.com.fiap.clyvovet.controller;
 
 import br.com.fiap.clyvovet.dto.request.BairroRequest;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.BairroResponse;
 import br.com.fiap.clyvovet.service.BairroService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,15 +26,14 @@ public class BairroController {
 
     @Operation(summary = "Cria um novo bairro")
     @PostMapping
-    public ResponseEntity<BairroResponse> createBairro(
+    public ResponseEntity<ApiResponse> createBairro(
             @Valid @RequestBody BairroRequest bairroRequest
     ) {
 
-        BairroResponse bairroSalvo =
-                bairroService.create(bairroRequest);
+        bairroService.create(bairroRequest);
 
         return new ResponseEntity<>(
-                bairroSalvo,
+                new ApiResponse("Bairro cadastrado com sucesso"),
                 HttpStatus.CREATED
         );
     }

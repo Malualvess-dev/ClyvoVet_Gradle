@@ -1,6 +1,7 @@
 package br.com.fiap.clyvovet.controller;
 
 import br.com.fiap.clyvovet.dto.request.CidadeRequest;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.CidadeResponse;
 import br.com.fiap.clyvovet.service.CidadeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,15 +26,14 @@ public class CidadeController {
 
     @Operation(summary = "Cria uma nova cidade")
     @PostMapping
-    public ResponseEntity<CidadeResponse> createCidade(
+    public ResponseEntity<ApiResponse> createCidade(
             @Valid @RequestBody CidadeRequest cidadeRequest
     ) {
 
-        CidadeResponse cidadeSalva =
-                cidadeService.create(cidadeRequest);
+        cidadeService.create(cidadeRequest);
 
         return new ResponseEntity<>(
-                cidadeSalva,
+                new ApiResponse("Cidade cadastrada com sucesso"),
                 HttpStatus.CREATED
         );
     }

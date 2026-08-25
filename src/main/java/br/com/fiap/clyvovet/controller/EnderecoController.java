@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.controller;
 
 
 import br.com.fiap.clyvovet.dto.request.EnderecoRequest;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.EnderecoResponse;
 import br.com.fiap.clyvovet.service.EnderecoService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,8 +26,16 @@ public class EnderecoController {
 
     @Operation(summary = "Cria um novo endereço")
     @PostMapping
-    public ResponseEntity<EnderecoResponse> createEndereco(@Valid @RequestBody EnderecoRequest enderecoRequest) {
-        return new ResponseEntity<>(enderecoService.create(enderecoRequest), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse> createEndereco(
+            @Valid @RequestBody EnderecoRequest enderecoRequest
+    ) {
+
+        enderecoService.create(enderecoRequest);
+
+        return new ResponseEntity<>(
+                new ApiResponse("Endereço cadastrado com sucesso"),
+                HttpStatus.CREATED
+        );
     }
 
     @Operation(summary = "Busca endereço por id")

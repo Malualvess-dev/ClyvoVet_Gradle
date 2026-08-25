@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.controller;
 
 
 import br.com.fiap.clyvovet.dto.request.UsuarioRequest;
+import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.UsuarioResponse;
 import br.com.fiap.clyvovet.service.UsuarioService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,8 +26,16 @@ public class UsuarioController {
 
     @Operation(summary = "Cria um novo usuário")
     @PostMapping
-    public ResponseEntity<UsuarioResponse> createUsuario(@Valid @RequestBody UsuarioRequest usuarioRequest) {
-        return new ResponseEntity<>(usuarioService.create(usuarioRequest), HttpStatus.CREATED);
+    public ResponseEntity<ApiResponse> createUsuario(
+            @Valid @RequestBody UsuarioRequest usuarioRequest
+    ) {
+
+        usuarioService.create(usuarioRequest);
+
+        return new ResponseEntity<>(
+                new ApiResponse("Usuário cadastrado com sucesso"),
+                HttpStatus.CREATED
+        );
     }
 
     @Operation(summary = "Busca usuário por id")
