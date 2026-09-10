@@ -7,6 +7,7 @@ import br.com.fiap.clyvovet.service.CidadeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -44,11 +45,8 @@ public class CidadeController {
             @PathVariable Integer id
     ) {
 
-        CidadeResponse cidade =
-                cidadeService.readCidade(id);
-
         return new ResponseEntity<>(
-                cidade,
+                cidadeService.readCidade(id),
                 HttpStatus.OK
         );
     }
@@ -56,7 +54,7 @@ public class CidadeController {
     @Operation(summary = "Lista cidades")
     @GetMapping
     public ResponseEntity<Page<CidadeResponse>> readCidades(
-            Pageable pageable
+            @ParameterObject Pageable pageable
     ) {
 
         return new ResponseEntity<>(
@@ -69,7 +67,7 @@ public class CidadeController {
     @GetMapping("/nome")
     public ResponseEntity<Page<CidadeResponse>> readByNome(
             @RequestParam String nome,
-            Pageable pageable
+            @ParameterObject Pageable pageable
     ) {
 
         return new ResponseEntity<>(
@@ -85,11 +83,8 @@ public class CidadeController {
             @Valid @RequestBody CidadeRequest cidadeRequest
     ) {
 
-        CidadeResponse cidadeAtualizada =
-                cidadeService.update(id, cidadeRequest);
-
         return new ResponseEntity<>(
-                cidadeAtualizada,
+                cidadeService.update(id, cidadeRequest),
                 HttpStatus.OK
         );
     }

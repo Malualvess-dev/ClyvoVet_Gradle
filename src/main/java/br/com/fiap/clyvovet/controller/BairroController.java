@@ -7,6 +7,7 @@ import br.com.fiap.clyvovet.service.BairroService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ public class BairroController {
         this.bairroService = bairroService;
     }
 
+    // CREATE
     @Operation(summary = "Cria um novo bairro")
     @PostMapping
     public ResponseEntity<ApiResponse> createBairro(
@@ -38,25 +40,24 @@ public class BairroController {
         );
     }
 
+    // READ POR ID
     @Operation(summary = "Busca bairro por id")
     @GetMapping("/{id}")
     public ResponseEntity<BairroResponse> readBairro(
             @PathVariable Integer id
     ) {
 
-        BairroResponse bairro =
-                bairroService.readBairro(id);
-
         return new ResponseEntity<>(
-                bairro,
+                bairroService.readBairro(id),
                 HttpStatus.OK
         );
     }
 
+    // READ TODOS
     @Operation(summary = "Lista bairros")
     @GetMapping
     public ResponseEntity<Page<BairroResponse>> readBairros(
-            Pageable pageable
+            @ParameterObject Pageable pageable
     ) {
 
         return new ResponseEntity<>(
@@ -65,11 +66,12 @@ public class BairroController {
         );
     }
 
+    // READ POR NOME
     @Operation(summary = "Busca bairro por nome")
     @GetMapping("/nome")
     public ResponseEntity<Page<BairroResponse>> readByNome(
             @RequestParam String nome,
-            Pageable pageable
+            @ParameterObject Pageable pageable
     ) {
 
         return new ResponseEntity<>(
@@ -78,6 +80,7 @@ public class BairroController {
         );
     }
 
+    // UPDATE
     @Operation(summary = "Atualiza bairro")
     @PutMapping("/{id}")
     public ResponseEntity<BairroResponse> updateBairro(
@@ -85,15 +88,13 @@ public class BairroController {
             @Valid @RequestBody BairroRequest bairroRequest
     ) {
 
-        BairroResponse bairroAtualizado =
-                bairroService.update(id, bairroRequest);
-
         return new ResponseEntity<>(
-                bairroAtualizado,
+                bairroService.update(id, bairroRequest),
                 HttpStatus.OK
         );
     }
 
+    // DELETE
     @Operation(summary = "Remove bairro")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteBairro(

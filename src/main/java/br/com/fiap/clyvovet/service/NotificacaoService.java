@@ -9,6 +9,7 @@ import br.com.fiap.clyvovet.model.Usuario;
 import br.com.fiap.clyvovet.repository.NotificacaoRepository;
 import br.com.fiap.clyvovet.repository.UsuarioRepository;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -31,37 +32,61 @@ public class NotificacaoService {
         this.notificacaoMapper = notificacaoMapper;
     }
 
-    //CRUD
-
-    //CREATE
+    // CREATE
     public NotificacaoResponse create(NotificacaoRequest request) {
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+        Usuario usuario = usuarioRepository
+                .findById(request.usuarioId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Usuário não encontrado"
+                        )
+                );
 
         Notificacao notificacao = new Notificacao();
+
         notificacao.setMensagem(request.mensagem());
+
         notificacao.setDataEnvio(
-                request.dataEnvio() != null ? request.dataEnvio() : LocalDateTime.now()
+                request.dataEnvio() != null
+                        ? request.dataEnvio()
+                        : LocalDateTime.now()
         );
+
         notificacao.setLida(request.lida());
         notificacao.setUsuario(usuario);
 
-        return notificacaoMapper.notificacaoToResponse(notificacaoRepository.save(notificacao));
+        return notificacaoMapper.notificacaoToResponse(
+                notificacaoRepository.save(notificacao)
+        );
     }
 
-    //READ
-
+    // READ POR ID
     public NotificacaoResponse readNotificacao(Integer id) {
-        Notificacao notificacao = notificacaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada"));
+
+        Notificacao notificacao = notificacaoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notificação não encontrada"
+                        )
+                );
 
         return notificacaoMapper.notificacaoToResponse(notificacao);
     }
 
+    // READ TODOS
     public Page<NotificacaoResponse> read(Pageable pageable) {
 
+        Pageable pageableSemOrdenacao =
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize()
+                );
+
         Page<NotificacaoResponse> notificacoes =
-                notificacaoRepository.findAll(pageable)
+                notificacaoRepository
+                        .findAll(pageableSemOrdenacao)
                         .map(notificacaoMapper::notificacaoToResponse);
 
         if (notificacoes.isEmpty()) {
@@ -73,33 +98,83 @@ public class NotificacaoService {
         return notificacoes;
     }
 
-    public Page<NotificacaoResponse> readByLida(String lida, Pageable pageable) {
-        return notificacaoRepository.findByLida(lida, pageable)
-                .map(notificacaoMapper::notificacaoToResponse);
+    // READ POR STATUS DE LEITURA
+    public Page<NotificacaoResponse> readByLida(
+            String lida,
+            Pageable pageable
+    ) {
+
+        Pageable pageableSemOrdenacao =
+                PageRequest.of(
+                        pageable.getPageNumber(),
+                        pageable.getPageSize()
+                );
+
+        Page<NotificacaoResponse> notificacoes =
+                notificacaoRepository
+                        .findByLida(
+                                lida,
+                                pageableSemOrdenacao
+                        )
+                        .map(notificacaoMapper::notificacaoToResponse);
+
+        if (notificacoes.isEmpty()) {
+            throw new ResourceNotFoundException(
+                    "Nenhuma notificação encontrada com esse status de leitura"
+            );
+        }
+
+        return notificacoes;
     }
 
-    //UPDATE
+    // UPDATE
+    public NotificacaoResponse update(
+            Integer id,
+            NotificacaoRequest request
+    ) {
 
-    public NotificacaoResponse update(Integer id, NotificacaoRequest request) {
-        Notificacao notificacao = notificacaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada"));
+        Notificacao notificacao = notificacaoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notificação não encontrada"
+                        )
+                );
 
-        Usuario usuario = usuarioRepository.findById(request.usuarioId())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+        Usuario usuario = usuarioRepository
+                .findById(request.usuarioId())
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Usuário não encontrado"
+                        )
+                );
 
         notificacao.setMensagem(request.mensagem());
-        notificacao.setDataEnvio(request.dataEnvio());
+
+        notificacao.setDataEnvio(
+                request.dataEnvio() != null
+                        ? request.dataEnvio()
+                        : notificacao.getDataEnvio()
+        );
+
         notificacao.setLida(request.lida());
         notificacao.setUsuario(usuario);
 
-        return notificacaoMapper.notificacaoToResponse(notificacaoRepository.save(notificacao));
+        return notificacaoMapper.notificacaoToResponse(
+                notificacaoRepository.save(notificacao)
+        );
     }
 
-    //DELETE
-
+    // DELETE
     public void delete(Integer id) {
-        Notificacao notificacao = notificacaoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Notificação não encontrada"));
+
+        Notificacao notificacao = notificacaoRepository
+                .findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException(
+                                "Notificação não encontrada"
+                        )
+                );
 
         notificacaoRepository.delete(notificacao);
     }

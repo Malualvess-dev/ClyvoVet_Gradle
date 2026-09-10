@@ -7,6 +7,7 @@ import br.com.fiap.clyvovet.service.VeterinarioService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -60,7 +61,7 @@ public class VeterinarioController {
     @Operation(summary = "Lista todos os veterinários")
     @GetMapping
     public ResponseEntity<Page<VeterinarioResponse>> readVeterinarios(
-            Pageable pageable
+            @ParameterObject Pageable pageable
     ) {
 
         return new ResponseEntity<>(

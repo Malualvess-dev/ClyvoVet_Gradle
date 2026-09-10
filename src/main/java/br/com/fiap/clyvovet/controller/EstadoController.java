@@ -3,11 +3,11 @@ package br.com.fiap.clyvovet.controller;
 import br.com.fiap.clyvovet.dto.request.EstadoRequest;
 import br.com.fiap.clyvovet.dto.response.ApiResponse;
 import br.com.fiap.clyvovet.dto.response.EstadoResponse;
-import br.com.fiap.clyvovet.model.Estado;
 import br.com.fiap.clyvovet.service.EstadoService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,8 +25,7 @@ public class EstadoController {
         this.estadoService = estadoService;
     }
 
-    //CREATE
-
+    // CREATE
     @Operation(summary = "Cria um novo estado")
     @PostMapping
     public ResponseEntity<ApiResponse> createEstado(
@@ -41,26 +40,24 @@ public class EstadoController {
         );
     }
 
-    //Acha os estados por ID
+    // READ POR ID
     @Operation(summary = "Busca um estado por id")
     @GetMapping("/{id}")
     public ResponseEntity<EstadoResponse> readEstado(
             @PathVariable Integer id
     ) {
 
-        EstadoResponse estado = estadoService.readEstado(id);
-
         return new ResponseEntity<>(
-                estado,
+                estadoService.readEstado(id),
                 HttpStatus.OK
         );
     }
 
-    //Lista todos os estados
+    // READ TODOS
     @Operation(summary = "Lista todos os estados")
     @GetMapping
     public ResponseEntity<Page<EstadoResponse>> readEstados(
-            Pageable pageable
+            @ParameterObject Pageable pageable
     ) {
 
         return new ResponseEntity<>(
@@ -69,22 +66,20 @@ public class EstadoController {
         );
     }
 
-    //Busca estados pela UF
+    // READ POR UF
     @Operation(summary = "Busca estado pela UF")
     @GetMapping("/uf/{uf}")
     public ResponseEntity<EstadoResponse> readByUf(
             @PathVariable String uf
     ) {
 
-        EstadoResponse estado = estadoService.readByUf(uf);
-
         return new ResponseEntity<>(
-                estado,
+                estadoService.readByUf(uf),
                 HttpStatus.OK
         );
     }
 
-    //Atualiza os estados
+    // UPDATE
     @Operation(summary = "Atualiza um estado")
     @PutMapping("/{id}")
     public ResponseEntity<EstadoResponse> updateEstado(
@@ -92,17 +87,13 @@ public class EstadoController {
             @Valid @RequestBody EstadoRequest estadoRequest
     ) {
 
-        EstadoResponse estadoAtualizado =
-                estadoService.update(id, estadoRequest);
-
         return new ResponseEntity<>(
-                estadoAtualizado,
+                estadoService.update(id, estadoRequest),
                 HttpStatus.OK
         );
     }
 
-    //Deleta um estado
-
+    // DELETE
     @Operation(summary = "Remove um estado")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteEstado(
