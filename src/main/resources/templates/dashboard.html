@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ClyvoVet - Dashboard</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">
+        ClyvoVet
+    </div>
+
+    <nav>
+
+        <a href="#"
+           class="active">
+            Início
+        </a>
+
+        <a href="#">
+            Agenda
+        </a>
+
+        <a href="#"
+           id="menuTutores">
+            Tutores
+        </a>
+
+        <a href="#"
+           id="menuVeterinarios">
+            Veterinários
+        </a>
+
+        <a href="#">
+            Anexos
+        </a>
+
+        <a href="#">
+            Notificações
+        </a>
+
+    </nav>
+
+    <button
+            id="logoutButton"
+            class="logout">
+        Sair
+    </button>
+
+</div>
+
+<main class="content">
+
+    <header>
+
+        <div>
+            <h1>Dashboard</h1>
+
+            <p>
+                Bem-vindo ao sistema ClyvoVet.
+            </p>
+        </div>
+
+        <div class="profile">
+            <span id="tipoUsuario">
+                Usuário
+            </span>
+        </div>
+
+    </header>
+
+    <section class="cards">
+
+        <div class="card">
+            <h3>Agenda</h3>
+
+            <p>
+                Gerencie consultas e compromissos.
+            </p>
+        </div>
+
+        <div class="card"
+             id="cardTutores">
+
+            <h3>Tutores</h3>
+
+            <p>
+                Consulte os tutores cadastrados.
+            </p>
+
+        </div>
+
+        <div class="card"
+             id="cardVeterinarios">
+
+            <h3>Veterinários</h3>
+
+            <p>
+                Gerencie os profissionais cadastrados.
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Anexos</h3>
+
+            <p>
+                Consulte e gerencie documentos e arquivos.
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>Notificações</h3>
+
+            <p>
+                Acompanhe as notificações do sistema.
+            </p>
+
+        </div>
+
+    </section>
+
+</main>
+
+<script th:src="@{/js/dashboard.js}"></script>
+
+</body>
+</html>

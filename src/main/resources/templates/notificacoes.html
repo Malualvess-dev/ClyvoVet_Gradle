@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClyvoVet - Notificações</title>
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+</head>
+
+<body>
+
+<div class="sidebar">
+
+    <div class="logo">ClyvoVet</div>
+
+    <nav>
+        <a href="/dashboard">Início</a>
+        <a href="/agenda">Agenda</a>
+        <a href="/tutores">Tutores</a>
+        <a href="/veterinarios">Veterinários</a>
+        <a href="/anexos">Anexos</a>
+        <a href="/notificacoes" class="active">Notificações</a>
+    </nav>
+
+    <button class="logout">Sair</button>
+
+</div>
+
+<main class="content">
+
+    <header>
+        <div>
+            <h1>Notificações</h1>
+            <p>Acompanhe as notificações do sistema.</p>
+        </div>
+
+        <div class="profile">
+            Usuário
+        </div>
+    </header>
+
+    <section class="cards">
+
+        <div class="card">
+            <h3>Nova notificação</h3>
+            <p>Cadastre uma nova notificação.</p>
+        </div>
+
+        <div class="card">
+            <h3>Consultar notificações</h3>
+            <p>Visualize as notificações cadastradas.</p>
+        </div>
+
+    </section>
+
+</main>
+
+</body>
+</html>

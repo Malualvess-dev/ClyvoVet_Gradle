@@ -42,83 +42,60 @@ public class SecurityConfig {
 
         return http
 
-                // DESABILITA CSRF
                 .csrf(csrf -> csrf.disable())
 
-                // API SEM SESSÃO
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(
                                 SessionCreationPolicy.STATELESS
                         )
                 )
 
-                // PERMISSÕES
                 .authorizeHttpRequests(auth -> auth
 
-                        // =========================
                         // ROTAS PÚBLICAS
-                        // =========================
-
-                        // LOGIN
                         .requestMatchers(
-                                "/auth/**"
-                        ).permitAll()
+                                "/login",
+                                "/auth/**",
+                                "/error",
 
-                        // ERROS DO SPRING
-                        .requestMatchers(
-                                "/error"
-                        ).permitAll()
+                                "/css/**",
+                                "/js/**",
+                                "/img/**",
+                                "/dashboard",
 
-                        // SWAGGER
-                        .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
 
-                        // CADASTRO DE USUÁRIO
+                        // CRIAÇÃO DE USUÁRIO
                         .requestMatchers(
                                 HttpMethod.POST,
                                 "/usuarios"
                         ).permitAll()
 
-
-                        // =========================
                         // USUÁRIOS
-                        // =========================
-
-                        // LISTAR / BUSCAR USUÁRIOS
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/usuarios/**"
                         ).hasRole("VETERINARIO")
 
-                        // ATUALIZAR USUÁRIOS
                         .requestMatchers(
                                 HttpMethod.PUT,
                                 "/usuarios/**"
                         ).hasRole("VETERINARIO")
 
-                        // EXCLUIR USUÁRIOS
                         .requestMatchers(
                                 HttpMethod.DELETE,
                                 "/usuarios/**"
                         ).hasRole("VETERINARIO")
 
-
-                        // =========================
                         // VETERINÁRIOS
-                        // =========================
-
                         .requestMatchers(
                                 "/veterinarios/**"
                         ).hasRole("VETERINARIO")
 
-
-                        // =========================
                         // TUTORES
-                        // =========================
-
                         .requestMatchers(
                                 "/tutores/**"
                         ).hasAnyRole(
@@ -126,11 +103,7 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
-                        // =========================
                         // AGENDAS
-                        // =========================
-
                         .requestMatchers(
                                 "/agendas/**"
                         ).hasAnyRole(
@@ -138,11 +111,7 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
-                        // =========================
                         // ANEXOS
-                        // =========================
-
                         .requestMatchers(
                                 "/anexos/**"
                         ).hasAnyRole(
@@ -150,11 +119,7 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
-                        // =========================
                         // NOTIFICAÇÕES
-                        // =========================
-
                         .requestMatchers(
                                 "/notificacoes/**"
                         ).hasAnyRole(
@@ -162,11 +127,7 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
-                        // =========================
                         // ENDEREÇOS
-                        // =========================
-
                         .requestMatchers(
                                 "/enderecos/**"
                         ).hasAnyRole(
@@ -174,11 +135,7 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
-                        // =========================
                         // ESTADOS
-                        // =========================
-
                         .requestMatchers(
                                 "/estados/**"
                         ).hasAnyRole(
@@ -186,11 +143,7 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
-                        // =========================
                         // CIDADES
-                        // =========================
-
                         .requestMatchers(
                                 "/cidades/**"
                         ).hasAnyRole(
@@ -198,11 +151,7 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
-                        // =========================
                         // BAIRROS
-                        // =========================
-
                         .requestMatchers(
                                 "/bairros/**"
                         ).hasAnyRole(
@@ -210,12 +159,11 @@ public class SecurityConfig {
                                 "VETERINARIO"
                         )
 
-
                         // QUALQUER OUTRA ROTA
-                        .anyRequest().authenticated()
+                        .anyRequest()
+                        .authenticated()
                 )
 
-                // FILTRO JWT
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class

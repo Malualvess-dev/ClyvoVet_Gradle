@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-br"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ClyvoVet - Login</title>
+
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+</head>
+
+<body>
+
+<div class="login-container">
+
+    <div class="login-left">
+
+        <h1>ClyvoVet</h1>
+
+        <p>
+            Cuidado, organização e tecnologia para facilitar
+            a rotina veterinária e o acompanhamento dos seus pets.
+        </p>
+
+    </div>
+
+    <div class="login-right">
+
+        <div class="login-card">
+
+            <h2>Bem-vindo</h2>
+
+            <p class="subtitle">
+                Entre na sua conta para continuar
+            </p>
+
+            <div id="errorMessage"
+                 class="error-message">
+                E-mail ou senha inválidos.
+            </div>
+
+            <form id="loginForm">
+
+                <div class="form-group">
+
+                    <label for="email">
+                        E-mail
+                    </label>
+
+                    <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="Digite seu e-mail"
+                            required
+                    >
+
+                </div>
+
+                <div class="form-group">
+
+                    <label for="senha">
+                        Senha
+                    </label>
+
+                    <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            placeholder="Digite sua senha"
+                            required
+                    >
+
+                </div>
+
+                <button
+                        type="submit"
+                        class="login-button">
+                    Entrar
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script th:src="@{/js/login.js}"></script>
+
+</body>
+</html>
