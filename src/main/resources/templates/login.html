@@ -4,9 +4,11 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ClyvoVet - Login</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SuperVet - Autenticação</title>
 
     <link rel="stylesheet"
           th:href="@{/css/style.css}">
@@ -14,81 +16,436 @@
 
 <body>
 
-<div class="login-container">
+<div class="auth-container">
 
-    <div class="login-left">
+    <!-- LADO ESQUERDO -->
 
-        <h1>ClyvoVet</h1>
+    <section class="auth-left">
 
-        <p>
-            Cuidado, organização e tecnologia para facilitar
-            a rotina veterinária e o acompanhamento dos seus pets.
-        </p>
+        <div class="brand">
 
-    </div>
-
-    <div class="login-right">
-
-        <div class="login-card">
-
-            <h2>Bem-vindo</h2>
-
-            <p class="subtitle">
-                Entre na sua conta para continuar
-            </p>
-
-            <div id="errorMessage"
-                 class="error-message">
-                E-mail ou senha inválidos.
+            <div class="brand-icon">
+                🐾
             </div>
 
-            <form id="loginForm">
+            <div>
+                <h1>SuperVet</h1>
 
-                <div class="form-group">
-
-                    <label for="email">
-                        E-mail
-                    </label>
-
-                    <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="Digite seu e-mail"
-                            required
-                    >
-
-                </div>
-
-                <div class="form-group">
-
-                    <label for="senha">
-                        Senha
-                    </label>
-
-                    <input
-                            type="password"
-                            id="senha"
-                            name="senha"
-                            placeholder="Digite sua senha"
-                            required
-                    >
-
-                </div>
-
-                <button
-                        type="submit"
-                        class="login-button">
-                    Entrar
-                </button>
-
-            </form>
+                <p class="brand-subtitle">
+                    Saúde pet organizada em um só lugar.
+                </p>
+            </div>
 
         </div>
 
-    </div>
+
+        <div class="hero-content">
+
+            <span class="hero-badge">
+                Plataforma veterinária
+            </span>
+
+            <h2>
+                Cuidado, organização
+                e tecnologia para seus pets.
+            </h2>
+
+            <p>
+                Gerencie consultas, tutores, veterinários,
+                documentos e notificações de forma simples.
+            </p>
+
+
+            <div class="hero-card">
+
+                <div class="hero-card-icon">
+                    +
+                </div>
+
+                <div>
+                    <strong>
+                        Gestão clínica simplificada
+                    </strong>
+
+                    <span>
+                        Todas as informações importantes
+                        reunidas em um único sistema.
+                    </span>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div class="auth-footer">
+            SuperVet • Sistema veterinário
+        </div>
+
+    </section>
+
+
+    <!-- LADO DIREITO -->
+
+    <section class="auth-right">
+
+        <div class="auth-card">
+
+            <div class="auth-header">
+
+                <div class="small-logo">
+                    🐾
+                </div>
+
+                <h2>
+                    Bem-vindo ao SuperVet
+                </h2>
+
+                <p>
+                    Entre na sua conta ou realize seu cadastro.
+                </p>
+
+            </div>
+
+
+            <!-- ABAS -->
+
+            <div class="auth-tabs">
+
+                <button
+                        type="button"
+                        id="tabLogin"
+                        class="tab-button active">
+
+                    Entrar
+
+                </button>
+
+
+                <button
+                        type="button"
+                        id="tabCadastro"
+                        class="tab-button">
+
+                    Criar conta
+
+                </button>
+
+            </div>
+
+
+            <!-- LOGIN -->
+
+            <div
+                    id="loginSection"
+                    class="form-section active">
+
+                <form id="loginForm">
+
+                    <div class="form-group">
+
+                        <label for="email">
+                            E-mail
+                        </label>
+
+                        <input
+                                type="email"
+                                id="email"
+                                placeholder="Digite seu e-mail"
+                                autocomplete="email"
+                                required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="senha">
+                            Senha
+                        </label>
+
+                        <input
+                                type="password"
+                                id="senha"
+                                placeholder="Digite sua senha"
+                                autocomplete="current-password"
+                                required>
+
+                    </div>
+
+
+                    <p
+                            id="errorMessage"
+                            class="message">
+                    </p>
+
+
+                    <button
+                            type="submit"
+                            class="auth-button">
+
+                        Gerar token de acesso
+
+                    </button>
+
+                </form>
+
+
+                <!-- TOKEN -->
+
+                <div
+                        id="tokenArea"
+                        class="token-area"
+                        style="display: none;">
+
+                    <div class="token-success">
+
+                        <div class="token-success-icon">
+                            ✓
+                        </div>
+
+                        <div>
+                            <strong>
+                                Autenticação realizada
+                            </strong>
+
+                            <span>
+                                Seu JWT foi gerado com sucesso.
+                            </span>
+                        </div>
+
+                    </div>
+
+
+                    <label for="tokenGerado">
+                        Token JWT gerado
+                    </label>
+
+                    <textarea
+                            id="tokenGerado"
+                            readonly
+                            rows="5">
+                    </textarea>
+
+
+                    <button
+                            type="button"
+                            id="copiarToken"
+                            class="copy-token-button">
+
+                        Copiar token
+
+                    </button>
+
+
+                    <div class="token-divider">
+
+                        <span>
+                            Validar acesso
+                        </span>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="tokenInformado">
+                            Cole o token para entrar
+                        </label>
+
+                        <textarea
+                                id="tokenInformado"
+                                rows="5"
+                                placeholder="Cole aqui o token JWT gerado acima...">
+                        </textarea>
+
+                    </div>
+
+
+                    <p
+                            id="tokenMessage"
+                            class="message">
+                    </p>
+
+
+                    <button
+                            type="button"
+                            id="validarToken"
+                            class="validate-token-button">
+
+                        Validar token
+
+                    </button>
+
+
+                    <button
+                            type="button"
+                            id="entrarSistema"
+                            class="auth-button enter-system-button"
+                            disabled>
+
+                        Entrar no SuperVet
+
+                    </button>
+
+                </div>
+
+
+                <div class="switch-message">
+
+                    <span>
+                        Ainda não possui uma conta?
+                    </span>
+
+                    <button
+                            type="button"
+                            id="abrirCadastro"
+                            class="link-button">
+
+                        Criar conta
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- CADASTRO -->
+
+            <div
+                    id="cadastroSection"
+                    class="form-section">
+
+                <form id="cadastroForm">
+
+                    <div class="form-group">
+
+                        <label for="cadastroEmail">
+                            E-mail
+                        </label>
+
+                        <input
+                                type="email"
+                                id="cadastroEmail"
+                                maxlength="80"
+                                placeholder="Digite seu e-mail"
+                                autocomplete="email"
+                                required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="cadastroSenha">
+                            Senha
+                        </label>
+
+                        <input
+                                type="password"
+                                id="cadastroSenha"
+                                minlength="8"
+                                maxlength="100"
+                                placeholder="Crie uma senha"
+                                autocomplete="new-password"
+                                required>
+
+                        <small>
+                            Use letra maiúscula, minúscula
+                            e pelo menos um número.
+                        </small>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="confirmarSenha">
+                            Confirmar senha
+                        </label>
+
+                        <input
+                                type="password"
+                                id="confirmarSenha"
+                                minlength="8"
+                                maxlength="100"
+                                placeholder="Digite a senha novamente"
+                                autocomplete="new-password"
+                                required>
+
+                    </div>
+
+
+                    <div class="form-group">
+
+                        <label for="tipoUser">
+                            Perfil
+                        </label>
+
+                        <select
+                                id="tipoUser"
+                                required>
+
+                            <option value="">
+                                Selecione o perfil
+                            </option>
+
+                            <option value="TUTOR">
+                                Tutor
+                            </option>
+
+                            <option value="VETERINARIO">
+                                Veterinário
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <p
+                            id="cadastroMessage"
+                            class="message">
+                    </p>
+
+
+                    <button
+                            type="submit"
+                            class="auth-button">
+
+                        Criar minha conta
+
+                    </button>
+
+                </form>
+
+
+                <div class="switch-message">
+
+                    <span>
+                        Já possui uma conta?
+                    </span>
+
+                    <button
+                            type="button"
+                            id="abrirLogin"
+                            class="link-button">
+
+                        Fazer login
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
 
 </div>
+
 
 <script th:src="@{/js/login.js}"></script>
 

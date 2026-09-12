@@ -3,96 +3,288 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ClyvoVet - Notificações</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SuperVet - Notificações</title>
 
     <link rel="stylesheet"
           th:href="@{/css/dashboard.css}">
+
 </head>
 
 <body>
 
-<div class="sidebar">
+<div class="app-layout">
 
-    <div class="logo">
-        ClyvoVet
-    </div>
+    <aside class="sidebar">
 
-    <nav>
+        <div>
 
-        <a href="/web/dashboard">
-            Início
-        </a>
+            <div class="sidebar-logo">
 
-        <a href="/web/agenda">
-            Agenda
-        </a>
+                <div class="logo-icon">
+                    🐾
+                </div>
 
-        <a href="/web/tutores"
-           id="menuTutores">
-            Tutores
-        </a>
+                <div>
+                    <h1>SuperVet</h1>
+                    <span>Gestão veterinária</span>
+                </div>
 
-        <a href="/web/veterinarios"
-           id="menuVeterinarios">
-            Veterinários
-        </a>
+            </div>
 
-        <a href="/web/anexos">
-            Anexos
-        </a>
 
-        <a href="/web/notificacoes"
-           class="active">
-            Notificações
-        </a>
+            <nav class="sidebar-nav">
 
-    </nav>
+                <a href="/web/dashboard"
+                   class="nav-item">
+                    <span class="nav-icon">⌂</span>
+                    <span>Início</span>
+                </a>
 
-    <button
-            id="logoutButton"
-            class="logout">
-        Sair
-    </button>
+                <a href="/web/agenda"
+                   class="nav-item">
+                    <span class="nav-icon">▣</span>
+                    <span>Agenda</span>
+                </a>
+
+                <a href="/web/tutores"
+                   id="menuTutores"
+                   class="nav-item">
+                    <span class="nav-icon">♙</span>
+                    <span>Tutores</span>
+                </a>
+
+                <a href="/web/veterinarios"
+                   id="menuVeterinarios"
+                   class="nav-item">
+                    <span class="nav-icon">✚</span>
+                    <span>Veterinários</span>
+                </a>
+
+                <a href="/web/anexos"
+                   class="nav-item">
+                    <span class="nav-icon">▤</span>
+                    <span>Anexos</span>
+                </a>
+
+                <a href="/web/notificacoes"
+                   class="nav-item active">
+                    <span class="nav-icon">♢</span>
+                    <span>Notificações</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <button type="button"
+                id="logoutButton"
+                class="logout-button">
+
+            <span>↪</span>
+            Sair da conta
+
+        </button>
+
+    </aside>
+
+
+    <main class="content">
+
+        <header class="topbar">
+
+            <div>
+                <span class="welcome-label">
+                    SuperVet
+                </span>
+
+                <h2>Notificações</h2>
+            </div>
+
+            <div class="profile-area">
+
+                <div class="profile-circle">
+                    ♢
+                </div>
+
+                <div class="profile-info">
+
+                    <span>Perfil conectado</span>
+
+                    <strong id="tipoUsuario">
+                        USUÁRIO
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="section-heading">
+
+            <h3>Central de notificações</h3>
+
+            <p>
+                Gerencie mensagens e avisos enviados
+                aos usuários.
+            </p>
+
+        </div>
+
+
+        <form id="notificacaoForm"
+              class="agenda-form">
+
+
+            <div class="form-group">
+
+                <label for="mensagemNotificacao">
+                    Mensagem
+                </label>
+
+                <textarea id="mensagemNotificacao"
+                          maxlength="200"
+                          placeholder="Digite a mensagem"
+                          required></textarea>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="dataEnvio">
+                    Data de envio
+                </label>
+
+                <input type="datetime-local"
+                       id="dataEnvio">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="lida">
+                    Status
+                </label>
+
+                <select id="lida">
+
+                    <option value="N">
+                        Não lida
+                    </option>
+
+                    <option value="S">
+                        Lida
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="usuarioId">
+                    ID do usuário
+                </label>
+
+                <input type="number"
+                       id="usuarioId"
+                       required>
+
+            </div>
+
+
+            <div class="form-buttons">
+
+                <button type="submit"
+                        id="salvarNotificacao"
+                        class="btn-primary">
+                    Salvar
+                </button>
+
+                <button type="button"
+                        id="cancelarEdicao"
+                        class="btn-secondary"
+                        style="display:none;">
+                    Cancelar edição
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <p id="mensagem"
+           class="mensagem"></p>
+
+
+        <section class="agenda-list-card">
+
+            <div class="section-heading">
+
+                <h3>Notificações registradas</h3>
+
+                <p>
+                    Mensagens disponíveis no sistema.
+                </p>
+
+            </div>
+
+            <div id="notificacoesList"></div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<main class="content">
 
-    <header>
+<div id="modalExcluir"
+     class="modal-overlay"
+     style="display:none;">
 
-        <div>
-            <h1>Notificações</h1>
-            <p>Acompanhe as notificações do sistema.</p>
+    <div class="modal">
+
+        <div class="modal-icon">
+            !
         </div>
 
-        <div class="profile">
-            <span id="tipoUsuario">
-                Usuário
-            </span>
+        <h3>Excluir notificação?</h3>
+
+        <p>
+            Esta ação não poderá ser desfeita.
+        </p>
+
+        <div class="modal-buttons">
+
+            <button id="cancelarExclusao"
+                    class="btn-cancelar">
+                Cancelar
+            </button>
+
+            <button id="confirmarExclusao"
+                    class="btn-excluir">
+                Excluir
+            </button>
+
         </div>
 
-    </header>
+    </div>
 
-    <section class="cards">
-
-        <div class="card">
-            <h3>Nova notificação</h3>
-            <p>Cadastre uma nova notificação.</p>
-        </div>
-
-        <div class="card">
-            <h3>Consultar notificações</h3>
-            <p>Visualize as notificações cadastradas.</p>
-        </div>
-
-    </section>
-
-</main>
+</div>
 
 <script th:src="@{/js/dashboard.js}"></script>
+<script th:src="@{/js/notificacoes.js}"></script>
 
 </body>
 </html>

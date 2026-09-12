@@ -4,9 +4,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>ClyvoVet - Dashboard</title>
+    <title>SuperVet - Início</title>
 
     <link rel="stylesheet"
           th:href="@{/css/dashboard.css}">
@@ -14,103 +15,341 @@
 
 <body>
 
-<div class="sidebar">
+<div class="app-layout">
 
-    <div class="logo">
-        ClyvoVet
-    </div>
-
-    <nav>
-
-        <a href="/web/dashboard"
-           class="active">
-            Início
-        </a>
-
-        <a href="/web/agenda">
-            Agenda
-        </a>
-
-        <a href="/web/tutores"
-           id="menuTutores">
-            Tutores
-        </a>
-
-        <a href="/web/veterinarios"
-           id="menuVeterinarios">
-            Veterinários
-        </a>
-
-        <a href="/web/anexos">
-            Anexos
-        </a>
-
-        <a href="/web/notificacoes">
-            Notificações
-        </a>
-
-    </nav>
-
-    <button
-            id="logoutButton"
-            class="logout">
-        Sair
-    </button>
-
-</div>
-
-<main class="content">
-
-    <header>
+    <aside class="sidebar">
 
         <div>
-            <h1>Dashboard</h1>
+
+            <div class="sidebar-logo">
+
+                <div class="logo-icon">
+                    🐾
+                </div>
+
+                <div>
+                    <h1>SuperVet</h1>
+                    <span>Gestão veterinária</span>
+                </div>
+
+            </div>
+
+            <nav class="sidebar-nav">
+
+                <a href="/web/dashboard"
+                   class="nav-item active">
+
+                    <span class="nav-icon">⌂</span>
+                    <span>Início</span>
+
+                </a>
+
+                <a href="/web/agenda"
+                   class="nav-item">
+
+                    <span class="nav-icon">▣</span>
+                    <span>Agenda</span>
+
+                </a>
+
+                <a href="/web/tutores"
+                   id="menuTutores"
+                   class="nav-item">
+
+                    <span class="nav-icon">♙</span>
+                    <span>Tutores</span>
+
+                </a>
+
+                <a href="/web/veterinarios"
+                   id="menuVeterinarios"
+                   class="nav-item">
+
+                    <span class="nav-icon">✚</span>
+                    <span>Veterinários</span>
+
+                </a>
+
+                <a href="/web/anexos"
+                   class="nav-item">
+
+                    <span class="nav-icon">▤</span>
+                    <span>Anexos</span>
+
+                </a>
+
+                <a href="/web/notificacoes"
+                   class="nav-item">
+
+                    <span class="nav-icon">♢</span>
+                    <span>Notificações</span>
+
+                </a>
+
+            </nav>
+
+        </div>
+
+        <button type="button"
+                id="logoutButton"
+                class="logout-button">
+
+            <span>↪</span>
+            Sair da conta
+
+        </button>
+
+    </aside>
+
+
+    <main class="content">
+
+        <header class="topbar">
+
+            <div>
+                <span class="welcome-label">
+                    Bem-vindo ao
+                </span>
+
+                <h2>SuperVet</h2>
+            </div>
+
+            <div class="profile-area">
+
+                <div class="profile-circle">
+                    👤
+                </div>
+
+                <div class="profile-info">
+
+                    <span>Perfil conectado</span>
+
+                    <strong id="tipoUsuario">
+                        USUÁRIO
+                    </strong>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <section class="dashboard-hero">
+
+            <div class="hero-text">
+
+                <span class="hero-tag">
+                    Central veterinária
+                </span>
+
+                <h1>
+                    Saúde pet organizada
+                    em um só lugar.
+                </h1>
+
+                <p>
+                    Acompanhe consultas, tutores,
+                    veterinários, documentos e notificações
+                    de forma simples.
+                </p>
+
+            </div>
+
+            <div class="hero-icon">
+                🐾
+            </div>
+
+            <div class="hero-highlight">
+
+                <div>
+
+                    <strong>
+                        Gestão clínica simplificada
+                    </strong>
+
+                    <p>
+                        Todas as áreas importantes
+                        reunidas no SuperVet.
+                    </p>
+
+                </div>
+
+                <span>→</span>
+
+            </div>
+
+        </section>
+
+
+        <div class="section-heading">
+
+            <h3>Acesso rápido</h3>
 
             <p>
-                Bem-vindo ao sistema ClyvoVet.
+                Escolha uma área para continuar.
             </p>
+
         </div>
 
-        <div class="profile">
-            <span id="tipoUsuario">
-                Usuário
-            </span>
-        </div>
 
-    </header>
+        <section class="dashboard-grid">
 
-    <section class="cards">
+            <a href="/web/agenda"
+               class="dashboard-card featured">
 
-        <div class="card">
-            <h3>Agenda</h3>
-            <p>Gerencie consultas e compromissos.</p>
-        </div>
+                <div class="card-icon">
+                    ▣
+                </div>
 
-        <div class="card"
-             id="cardTutores">
-            <h3>Tutores</h3>
-            <p>Consulte os tutores cadastrados.</p>
-        </div>
+                <div class="card-content">
 
-        <div class="card"
-             id="cardVeterinarios">
-            <h3>Veterinários</h3>
-            <p>Gerencie os profissionais cadastrados.</p>
-        </div>
+                    <h3>Agenda</h3>
 
-        <div class="card">
-            <h3>Anexos</h3>
-            <p>Consulte e gerencie documentos e arquivos.</p>
-        </div>
+                    <p>
+                        Organize consultas,
+                        compromissos e registros.
+                    </p>
 
-        <div class="card">
-            <h3>Notificações</h3>
-            <p>Acompanhe as notificações do sistema.</p>
-        </div>
+                    <span class="card-link">
+                        Abrir agenda →
+                    </span>
 
-    </section>
+                </div>
 
-</main>
+            </a>
+
+
+            <a href="/web/tutores"
+               id="cardTutores"
+               class="dashboard-card">
+
+                <div class="card-icon">
+                    ♙
+                </div>
+
+                <div class="card-content">
+
+                    <h3>Tutores</h3>
+
+                    <p>
+                        Visualize e gerencie
+                        os tutores cadastrados.
+                    </p>
+
+                    <span class="card-link">
+                        Ver tutores →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <a href="/web/veterinarios"
+               id="cardVeterinarios"
+               class="dashboard-card">
+
+                <div class="card-icon">
+                    ✚
+                </div>
+
+                <div class="card-content">
+
+                    <h3>Veterinários</h3>
+
+                    <p>
+                        Consulte e gerencie
+                        a equipe veterinária.
+                    </p>
+
+                    <span class="card-link">
+                        Ver veterinários →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <a href="/web/anexos"
+               class="dashboard-card">
+
+                <div class="card-icon">
+                    ▤
+                </div>
+
+                <div class="card-content">
+
+                    <h3>Anexos</h3>
+
+                    <p>
+                        Organize documentos
+                        e arquivos dos usuários.
+                    </p>
+
+                    <span class="card-link">
+                        Abrir anexos →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <a href="/web/notificacoes"
+               class="dashboard-card">
+
+                <div class="card-icon">
+                    ♢
+                </div>
+
+                <div class="card-content">
+
+                    <h3>Notificações</h3>
+
+                    <p>
+                        Consulte alertas e
+                        mensagens registradas.
+                    </p>
+
+                    <span class="card-link">
+                        Ver notificações →
+                    </span>
+
+                </div>
+
+            </a>
+
+
+            <div class="dashboard-card security-card">
+
+                <div class="card-icon">
+                    ✓
+                </div>
+
+                <div class="card-content">
+
+                    <h3>Sessão protegida</h3>
+
+                    <p>
+                        Sua autenticação está
+                        protegida através de JWT.
+                    </p>
+
+                    <span class="security-status">
+                        Autenticação ativa
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
 
 <script th:src="@{/js/dashboard.js}"></script>
 

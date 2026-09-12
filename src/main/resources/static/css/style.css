@@ -1,126 +1,1228 @@
+/* =========================================
+   SUPERVET - LOGIN / AUTENTICAÇÃO
+========================================= */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family:
+        Arial,
+        Helvetica,
+        sans-serif;
 }
+
+
+:root {
+
+    --orange:
+        #ff6b0b;
+
+    --orange-dark:
+        #d94d00;
+
+    --orange-light:
+        #fff0dc;
+
+    --cream:
+        #fffaf4;
+
+    --cream-dark:
+        #ffecd2;
+
+    --white:
+        #ffffff;
+
+    --brown:
+        #321d14;
+
+    --brown-light:
+        #5c4034;
+
+    --text:
+        #30231d;
+
+    --text-light:
+        #776d68;
+
+    --border:
+        #f2dfcd;
+
+    --success:
+        #16834a;
+
+    --success-bg:
+        #edf9f1;
+
+    --error:
+        #d92d20;
+}
+
+
+/* =========================================
+   BODY
+========================================= */
 
 body {
+
     min-height: 100vh;
-    background: #f4f8fb;
+
+    background:
+        var(--cream);
+
+    color:
+        var(--text);
 }
 
-.login-container {
-    min-height: 100vh;
-    display: flex;
-}
 
-.login-left {
-    width: 50%;
-    background: #1976d2;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: white;
-    padding: 50px;
-    text-align: center;
-}
+/* =========================================
+   CONTAINER
+========================================= */
 
-.login-left h1 {
-    font-size: 52px;
-    margin-bottom: 20px;
-}
+.auth-container {
 
-.login-left p {
-    font-size: 18px;
-    max-width: 450px;
-    line-height: 1.6;
-}
-
-.login-right {
-    width: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 40px;
-}
-
-.login-card {
     width: 100%;
-    max-width: 420px;
-    background: white;
+
+    min-height: 100vh;
+
+    display: flex;
+}
+
+
+/* =========================================
+   LADO LARANJA
+========================================= */
+
+.auth-left {
+
+    width: 46%;
+
+    min-height: 100vh;
+
+    padding:
+        55px 65px;
+
+    color:
+        white;
+
+    display: flex;
+
+    flex-direction: column;
+
+    justify-content:
+        space-between;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ff7919 0%,
+            #f45b00 55%,
+            #c63c00 100%
+        );
+
+    position: relative;
+
+    overflow: hidden;
+}
+
+
+/* círculo decorativo */
+
+.auth-left::before {
+
+    content: "";
+
+    position: absolute;
+
+    width: 350px;
+
+    height: 350px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.06
+        );
+
+    top: -150px;
+
+    right: -150px;
+}
+
+
+.auth-left::after {
+
+    content: "";
+
+    position: absolute;
+
+    width: 260px;
+
+    height: 260px;
+
+    border-radius: 50%;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.05
+        );
+
+    bottom: -130px;
+
+    left: -100px;
+}
+
+
+/* =========================================
+   MARCA
+========================================= */
+
+.brand {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    position: relative;
+
+    z-index: 2;
+}
+
+
+.brand-icon {
+
+    width: 52px;
+
+    height: 52px;
+
+    border-radius: 17px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.18
+        );
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            0.25
+        );
+
+    font-size: 23px;
+}
+
+
+.brand h1 {
+
+    font-size: 35px;
+
+    font-weight: 800;
+}
+
+
+.brand-subtitle {
+
+    margin-top: 4px;
+
+    color:
+        #fff1e8;
+
+    font-size: 14px;
+}
+
+
+/* =========================================
+   HERO
+========================================= */
+
+.hero-content {
+
+    max-width: 500px;
+
+    position: relative;
+
+    z-index: 2;
+}
+
+
+.hero-badge {
+
+    display: inline-block;
+
+    padding:
+        8px 14px;
+
+    margin-bottom: 20px;
+
+    border-radius: 30px;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            0.17
+        );
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+.hero-content h2 {
+
+    font-size: 42px;
+
+    line-height: 1.1;
+
+    margin-bottom: 18px;
+
+    max-width: 500px;
+}
+
+
+.hero-content > p {
+
+    font-size: 16px;
+
+    line-height: 1.6;
+
+    color:
+        #fff3ec;
+
+    max-width: 450px;
+}
+
+
+/* =========================================
+   HERO CARD
+========================================= */
+
+.hero-card {
+
+    margin-top: 35px;
+
+    padding: 18px;
+
+    border-radius: 20px;
+
+    background:
+        #fffaf7;
+
+    color:
+        var(--brown);
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+
+    box-shadow:
+        0 12px 30px
+        rgba(
+            95,
+            32,
+            0,
+            0.13
+        );
+}
+
+
+.hero-card-icon {
+
+    width: 42px;
+
+    height: 42px;
+
+    min-width: 42px;
+
+    border-radius: 13px;
+
+    background:
+        var(--orange-light);
+
+    color:
+        var(--orange);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-size: 25px;
+
+    font-weight: 300;
+}
+
+
+.hero-card strong {
+
+    display: block;
+
+    margin-bottom: 5px;
+
+    color:
+        #ac440b;
+}
+
+
+.hero-card span {
+
+    display: block;
+
+    font-size: 13px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================
+   FOOTER ESQUERDO
+========================================= */
+
+.auth-footer {
+
+    position: relative;
+
+    z-index: 2;
+
+    font-size: 12px;
+
+    color:
+        rgba(
+            255,
+            255,
+            255,
+            0.75
+        );
+}
+
+
+/* =========================================
+   ÁREA DIREITA
+========================================= */
+
+.auth-right {
+
+    width: 54%;
+
+    min-height: 100vh;
+
     padding: 45px;
-    border-radius: 16px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    background:
+        var(--cream);
 }
 
-.login-card h2 {
-    color: #1f2937;
+
+/* =========================================
+   CARD LOGIN
+========================================= */
+
+.auth-card {
+
+    width: 100%;
+
+    max-width: 500px;
+
+    padding:
+        38px;
+
+    background:
+        var(--white);
+
+    border:
+        1px solid
+        var(--border);
+
+    border-radius:
+        28px;
+
+    box-shadow:
+        0 20px 60px
+        rgba(
+            88,
+            52,
+            31,
+            0.10
+        );
+}
+
+
+/* =========================================
+   HEADER
+========================================= */
+
+.auth-header {
+
+    text-align: center;
+
+    margin-bottom: 27px;
+}
+
+
+.small-logo {
+
+    width: 48px;
+
+    height: 48px;
+
+    margin:
+        0 auto 15px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    border-radius: 15px;
+
+    background:
+        var(--orange-light);
+
+    color:
+        var(--orange);
+
+    font-size: 21px;
+}
+
+
+.auth-header h2 {
+
+    font-size: 27px;
+
+    color:
+        var(--brown);
+
     margin-bottom: 8px;
-    font-size: 30px;
 }
 
-.subtitle {
-    color: #6b7280;
-    margin-bottom: 30px;
+
+.auth-header p {
+
+    font-size: 14px;
+
+    color:
+        var(--text-light);
 }
+
+
+/* =========================================
+   TABS
+========================================= */
+
+.auth-tabs {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(
+            2,
+            1fr
+        );
+
+    padding: 5px;
+
+    margin-bottom: 27px;
+
+    background:
+        #fff4e7;
+
+    border-radius: 14px;
+}
+
+
+.tab-button {
+
+    padding: 12px;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background:
+        transparent;
+
+    color:
+        var(--text-light);
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        0.2s;
+}
+
+
+.tab-button.active {
+
+    background:
+        var(--white);
+
+    color:
+        var(--orange-dark);
+
+    box-shadow:
+        0 4px 12px
+        rgba(
+            139,
+            72,
+            23,
+            0.10
+        );
+}
+
+
+/* =========================================
+   SEÇÕES
+========================================= */
+
+.form-section {
+
+    display: none;
+}
+
+
+.form-section.active {
+
+    display: block;
+}
+
+
+/* =========================================
+   FORM GROUP
+========================================= */
 
 .form-group {
-    margin-bottom: 20px;
+
+    margin-bottom: 19px;
+
+    display: flex;
+
+    flex-direction: column;
 }
+
 
 .form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: #374151;
-    font-weight: 600;
-}
 
-.form-group input {
-    width: 100%;
-    padding: 13px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    font-size: 15px;
-    outline: none;
-}
+    margin-bottom: 7px;
 
-.form-group input:focus {
-    border-color: #1976d2;
-}
+    color:
+        var(--brown);
 
-.login-button {
-    width: 100%;
-    border: none;
-    background: #1976d2;
-    color: white;
-    padding: 14px;
-    border-radius: 8px;
-    font-size: 16px;
+    font-size: 14px;
+
     font-weight: bold;
+}
+
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+
+    width: 100%;
+
+    padding:
+        13px 14px;
+
+    background:
+        #fffdfa;
+
+    color:
+        var(--text);
+
+    border:
+        1px solid
+        #ead9ca;
+
+    border-radius:
+        12px;
+
+    outline: none;
+
+    font-size: 14px;
+
+    transition:
+        0.2s;
+}
+
+
+.form-group textarea {
+
+    resize: vertical;
+
+    min-height: 100px;
+
+    line-height: 1.5;
+
+    font-size: 12px;
+}
+
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+
+    border-color:
+        var(--orange);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(
+            255,
+            107,
+            11,
+            0.10
+        );
+}
+
+
+.form-group small {
+
+    margin-top: 6px;
+
+    color:
+        var(--text-light);
+
+    font-size: 12px;
+
+    line-height: 1.4;
+}
+
+
+/* =========================================
+   BOTÃO PRINCIPAL
+========================================= */
+
+.auth-button {
+
+    width: 100%;
+
+    min-height: 48px;
+
+    padding:
+        13px 18px;
+
+    border: none;
+
+    border-radius:
+        14px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #ff7a18,
+            #ff5a00
+        );
+
+    color:
+        white;
+
+    font-size: 14px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s,
+        box-shadow 0.2s;
+}
+
+
+.auth-button:hover:not(:disabled) {
+
+    transform:
+        translateY(-1px);
+
+    box-shadow:
+        0 9px 20px
+        rgba(
+            255,
+            91,
+            0,
+            0.22
+        );
+}
+
+
+.auth-button:disabled {
+
+    cursor: not-allowed;
+
+    opacity: 0.50;
+
+    background:
+        #b9afa9;
+}
+
+
+/* =========================================
+   TOKEN
+========================================= */
+
+.token-area {
+
+    margin-top:
+        25px;
+
+    padding:
+        20px;
+
+    border-radius:
+        20px;
+
+    background:
+        #fff8ef;
+
+    border:
+        1px solid
+        #f2d7ba;
+}
+
+
+.token-success {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    padding: 13px;
+
+    margin-bottom: 18px;
+
+    border-radius: 13px;
+
+    background:
+        var(--success-bg);
+
+    color:
+        var(--success);
+}
+
+
+.token-success-icon {
+
+    width: 34px;
+
+    height: 34px;
+
+    border-radius: 50%;
+
+    background:
+        var(--success);
+
+    color: white;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    font-weight: bold;
+}
+
+
+.token-success strong {
+
+    display: block;
+
+    margin-bottom: 3px;
+
+    font-size: 13px;
+}
+
+
+.token-success span {
+
+    display: block;
+
+    font-size: 12px;
+}
+
+
+.token-area > label {
+
+    display: block;
+
+    margin-bottom: 8px;
+
+    color:
+        var(--brown);
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+.token-area > textarea {
+
+    width: 100%;
+
+    min-height: 100px;
+
+    padding: 12px;
+
+    border:
+        1px solid
+        #ead9ca;
+
+    border-radius: 12px;
+
+    background:
+        white;
+
+    color:
+        var(--text);
+
+    resize: vertical;
+
+    outline: none;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+}
+
+
+/* =========================================
+   COPIAR TOKEN
+========================================= */
+
+.copy-token-button {
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 12px;
+
+    border:
+        1px solid
+        #ffc693;
+
+    border-radius: 12px;
+
+    background:
+        #fff0df;
+
+    color:
+        #c9500b;
+
+    font-weight: bold;
+
     cursor: pointer;
 }
 
-.login-button:hover {
-    background: #1565c0;
+
+.copy-token-button:hover {
+
+    background:
+        #ffe5c8;
 }
 
-.error-message {
-    display: none;
-    background: #fee2e2;
-    color: #b91c1c;
+
+/* =========================================
+   DIVISOR
+========================================= */
+
+.token-divider {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin:
+        25px 0;
+}
+
+
+.token-divider::before,
+.token-divider::after {
+
+    content: "";
+
+    height: 1px;
+
+    flex: 1;
+
+    background:
+        #ead9ca;
+}
+
+
+.token-divider span {
+
+    color:
+        var(--text-light);
+
+    font-size: 12px;
+
+    font-weight: bold;
+}
+
+
+/* =========================================
+   VALIDAR TOKEN
+========================================= */
+
+.validate-token-button {
+
+    width: 100%;
+
     padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 20px;
+
+    margin-bottom:
+        10px;
+
+    border:
+        1px solid
+        var(--orange);
+
+    border-radius:
+        12px;
+
+    background:
+        white;
+
+    color:
+        var(--orange-dark);
+
+    font-weight: bold;
+
+    cursor: pointer;
 }
 
-@media (max-width: 800px) {
-    .login-left {
+
+.validate-token-button:hover {
+
+    background:
+        #fff4e8;
+}
+
+
+.enter-system-button {
+
+    margin-top: 2px;
+}
+
+
+/* =========================================
+   LOGIN / CADASTRO
+========================================= */
+
+.switch-message {
+
+    margin-top: 22px;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 5px;
+
+    color:
+        var(--text-light);
+
+    font-size: 13px;
+}
+
+
+.link-button {
+
+    border: none;
+
+    background: transparent;
+
+    color:
+        var(--orange-dark);
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+
+.link-button:hover {
+
+    text-decoration:
+        underline;
+}
+
+
+/* =========================================
+   MENSAGENS
+========================================= */
+
+.message {
+
+    min-height: 20px;
+
+    margin-bottom: 13px;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+
+.message.error {
+
+    color:
+        var(--error);
+}
+
+
+.message.success {
+
+    color:
+        var(--success);
+}
+
+
+/* =========================================
+   RESPONSIVO
+========================================= */
+
+@media (
+    max-width: 900px
+) {
+
+    .auth-container {
+
+        flex-direction:
+            column;
+    }
+
+
+    .auth-left {
+
+        width: 100%;
+
+        min-height:
+            auto;
+
+        padding:
+            35px 30px;
+
+        border-radius:
+            0 0 30px 30px;
+    }
+
+
+    .hero-content {
+
+        margin-top: 35px;
+    }
+
+
+    .hero-content h2 {
+
+        font-size: 30px;
+    }
+
+
+    .hero-card,
+    .auth-footer {
+
         display: none;
     }
 
-    .login-right {
+
+    .auth-right {
+
         width: 100%;
+
+        min-height:
+            auto;
+
+        padding:
+            25px 15px 40px;
+    }
+
+
+    .auth-card {
+
+        max-width:
+            520px;
+
+        padding:
+            28px 22px;
+
+        border-radius:
+            23px;
+    }
+}
+
+
+@media (
+    max-width: 480px
+) {
+
+    .auth-left {
+
+        padding:
+            28px 22px;
+    }
+
+
+    .brand h1 {
+
+        font-size:
+            28px;
+    }
+
+
+    .hero-content h2 {
+
+        font-size:
+            25px;
+    }
+
+
+    .hero-content > p {
+
+        font-size:
+            14px;
     }
 }

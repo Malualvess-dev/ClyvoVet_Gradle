@@ -3,96 +3,311 @@
       xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>ClyvoVet - Anexos</title>
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>SuperVet - Anexos</title>
 
     <link rel="stylesheet"
           th:href="@{/css/dashboard.css}">
+
 </head>
 
 <body>
 
-<div class="sidebar">
+<div class="app-layout">
 
-    <div class="logo">
-        ClyvoVet
-    </div>
+    <aside class="sidebar">
 
-    <nav>
+        <div>
 
-        <a href="/web/dashboard">
-            Início
-        </a>
+            <div class="sidebar-logo">
 
-        <a href="/web/agenda">
-            Agenda
-        </a>
+                <div class="logo-icon">🐾</div>
 
-        <a href="/web/tutores"
-           id="menuTutores">
-            Tutores
-        </a>
+                <div>
+                    <h1>SuperVet</h1>
+                    <span>Gestão veterinária</span>
+                </div>
 
-        <a href="/web/veterinarios"
-           id="menuVeterinarios">
-            Veterinários
-        </a>
+            </div>
 
-        <a href="/web/anexos"
-           class="active">
-            Anexos
-        </a>
 
-        <a href="/web/notificacoes">
-            Notificações
-        </a>
+            <nav class="sidebar-nav">
 
-    </nav>
+                <a href="/web/dashboard"
+                   class="nav-item">
+                    <span class="nav-icon">⌂</span>
+                    <span>Início</span>
+                </a>
 
-    <button
-            id="logoutButton"
-            class="logout">
-        Sair
-    </button>
+                <a href="/web/agenda"
+                   class="nav-item">
+                    <span class="nav-icon">▣</span>
+                    <span>Agenda</span>
+                </a>
+
+                <a href="/web/tutores"
+                   id="menuTutores"
+                   class="nav-item">
+                    <span class="nav-icon">♙</span>
+                    <span>Tutores</span>
+                </a>
+
+                <a href="/web/veterinarios"
+                   id="menuVeterinarios"
+                   class="nav-item">
+                    <span class="nav-icon">✚</span>
+                    <span>Veterinários</span>
+                </a>
+
+                <a href="/web/anexos"
+                   class="nav-item active">
+                    <span class="nav-icon">▤</span>
+                    <span>Anexos</span>
+                </a>
+
+                <a href="/web/notificacoes"
+                   class="nav-item">
+                    <span class="nav-icon">♢</span>
+                    <span>Notificações</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+
+        <button type="button"
+                id="logoutButton"
+                class="logout-button">
+            <span>↪</span>
+            Sair da conta
+        </button>
+
+    </aside>
+
+
+    <main class="content">
+
+        <header class="topbar">
+
+            <div>
+                <span class="welcome-label">
+                    SuperVet
+                </span>
+
+                <h2>Anexos</h2>
+            </div>
+
+            <div class="profile-area">
+
+                <div class="profile-circle">
+                    ▤
+                </div>
+
+                <div class="profile-info">
+                    <span>Perfil conectado</span>
+                    <strong id="tipoUsuario">
+                        USUÁRIO
+                    </strong>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="section-heading">
+
+            <h3>Documentos</h3>
+
+            <p>
+                Organize arquivos vinculados aos usuários.
+            </p>
+
+        </div>
+
+
+        <form id="anexoForm"
+              class="agenda-form">
+
+
+            <div class="form-group">
+
+                <label for="nomeArquivo">
+                    Nome do arquivo
+                </label>
+
+                <input type="text"
+                       id="nomeArquivo"
+                       maxlength="255"
+                       required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="tipoArquivo">
+                    Tipo
+                </label>
+
+                <select id="tipoArquivo"
+                        required>
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="PDF">PDF</option>
+                    <option value="PNG">PNG</option>
+                    <option value="JPG">JPG</option>
+                    <option value="JPEG">JPEG</option>
+                    <option value="DOCX">DOCX</option>
+                    <option value="TXT">TXT</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="url">
+                    URL
+                </label>
+
+                <input type="text"
+                       id="url"
+                       maxlength="255">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="tamanhoKb">
+                    Tamanho em KB
+                </label>
+
+                <input type="number"
+                       id="tamanhoKb"
+                       min="0"
+                       step="0.01">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="dataCriacao">
+                    Data de criação
+                </label>
+
+                <input type="datetime-local"
+                       id="dataCriacao">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="usuarioId">
+                    ID do usuário
+                </label>
+
+                <input type="number"
+                       id="usuarioId"
+                       required>
+
+            </div>
+
+
+            <div class="form-buttons">
+
+                <button type="submit"
+                        id="salvarAnexo"
+                        class="btn-primary">
+                    Salvar
+                </button>
+
+                <button type="button"
+                        id="cancelarEdicao"
+                        class="btn-secondary"
+                        style="display:none;">
+                    Cancelar edição
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <p id="mensagem"
+           class="mensagem"></p>
+
+
+        <section class="agenda-list-card">
+
+            <div class="section-heading">
+
+                <h3>Arquivos cadastrados</h3>
+
+                <p>
+                    Documentos registrados na plataforma.
+                </p>
+
+            </div>
+
+            <div id="anexosList"></div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<main class="content">
 
-    <header>
+<div id="modalExcluir"
+     class="modal-overlay"
+     style="display:none;">
 
-        <div>
-            <h1>Anexos</h1>
-            <p>Gerencie documentos e arquivos do sistema.</p>
+    <div class="modal">
+
+        <div class="modal-icon">
+            !
         </div>
 
-        <div class="profile">
-            <span id="tipoUsuario">
-                Usuário
-            </span>
+        <h3>Excluir anexo?</h3>
+
+        <p>
+            Esta ação não poderá ser desfeita.
+        </p>
+
+        <div class="modal-buttons">
+
+            <button id="cancelarExclusao"
+                    class="btn-cancelar">
+                Cancelar
+            </button>
+
+            <button id="confirmarExclusao"
+                    class="btn-excluir">
+                Excluir
+            </button>
+
         </div>
 
-    </header>
+    </div>
 
-    <section class="cards">
-
-        <div class="card">
-            <h3>Novo anexo</h3>
-            <p>Cadastre um novo documento ou arquivo.</p>
-        </div>
-
-        <div class="card">
-            <h3>Consultar anexos</h3>
-            <p>Visualize os anexos cadastrados.</p>
-        </div>
-
-    </section>
-
-</main>
+</div>
 
 <script th:src="@{/js/dashboard.js}"></script>
+<script th:src="@{/js/anexos.js}"></script>
 
 </body>
 </html>

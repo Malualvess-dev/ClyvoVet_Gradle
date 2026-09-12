@@ -4,9 +4,10 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
-    <title>ClyvoVet - Tutores</title>
+    <title>SuperVet - Tutores</title>
 
     <link rel="stylesheet"
           th:href="@{/css/dashboard.css}">
@@ -14,89 +15,263 @@
 
 <body>
 
-<div class="sidebar">
+<div class="app-layout">
 
-    <div class="logo">
-        ClyvoVet
-    </div>
+    <aside class="sidebar">
 
-    <nav>
+        <div>
 
-        <a href="/web/dashboard">
-            Início
-        </a>
+            <div class="sidebar-logo">
+                <div class="logo-icon">🐾</div>
 
-        <a href="/web/agenda">
-            Agenda
-        </a>
+                <div>
+                    <h1>SuperVet</h1>
+                    <span>Gestão veterinária</span>
+                </div>
+            </div>
 
-        <a href="/web/tutores"
-           id="menuTutores"
-           class="active">
-            Tutores
-        </a>
 
-        <a href="/web/veterinarios"
-           id="menuVeterinarios">
-            Veterinários
-        </a>
+            <nav class="sidebar-nav">
 
-        <a href="/web/anexos">
-            Anexos
-        </a>
+                <a href="/web/dashboard"
+                   class="nav-item">
+                    <span class="nav-icon">⌂</span>
+                    <span>Início</span>
+                </a>
 
-        <a href="/web/notificacoes">
-            Notificações
-        </a>
+                <a href="/web/agenda"
+                   class="nav-item">
+                    <span class="nav-icon">▣</span>
+                    <span>Agenda</span>
+                </a>
 
-    </nav>
+                <a href="/web/tutores"
+                   id="menuTutores"
+                   class="nav-item active">
+                    <span class="nav-icon">♙</span>
+                    <span>Tutores</span>
+                </a>
 
-    <button
-            id="logoutButton"
-            class="logout">
-        Sair
-    </button>
+                <a href="/web/veterinarios"
+                   id="menuVeterinarios"
+                   class="nav-item">
+                    <span class="nav-icon">✚</span>
+                    <span>Veterinários</span>
+                </a>
+
+                <a href="/web/anexos"
+                   class="nav-item">
+                    <span class="nav-icon">▤</span>
+                    <span>Anexos</span>
+                </a>
+
+                <a href="/web/notificacoes"
+                   class="nav-item">
+                    <span class="nav-icon">♢</span>
+                    <span>Notificações</span>
+                </a>
+
+            </nav>
+
+        </div>
+
+        <button type="button"
+                id="logoutButton"
+                class="logout-button">
+            <span>↪</span>
+            Sair da conta
+        </button>
+
+    </aside>
+
+
+    <main class="content">
+
+        <header class="topbar">
+
+            <div>
+                <span class="welcome-label">
+                    SuperVet
+                </span>
+
+                <h2>Tutores</h2>
+            </div>
+
+            <div class="profile-area">
+
+                <div class="profile-circle">♙</div>
+
+                <div class="profile-info">
+                    <span>Perfil conectado</span>
+                    <strong id="tipoUsuario">
+                        USUÁRIO
+                    </strong>
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <div class="section-heading">
+
+            <h3>Pacientes acompanhados</h3>
+
+            <p>
+                Gerencie os responsáveis pelos pets.
+            </p>
+
+        </div>
+
+
+        <form id="tutorForm"
+              class="agenda-form">
+
+            <div class="form-group">
+
+                <label for="nomeTutor">
+                    Nome do tutor
+                </label>
+
+                <input type="text"
+                       id="nomeTutor"
+                       maxlength="100"
+                       required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="cpf">
+                    CPF
+                </label>
+
+                <input type="text"
+                       id="cpf"
+                       placeholder="000.000.000-00"
+                       required>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="telefone">
+                    Telefone
+                </label>
+
+                <input type="text"
+                       id="telefone"
+                       placeholder="11999999999">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="dataNascimento">
+                    Data de nascimento
+                </label>
+
+                <input type="date"
+                       id="dataNascimento">
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="usuarioId">
+                    ID do usuário
+                </label>
+
+                <input type="number"
+                       id="usuarioId"
+                       required>
+
+            </div>
+
+
+            <div class="form-buttons">
+
+                <button type="submit"
+                        id="salvarTutor"
+                        class="btn-primary">
+                    Salvar
+                </button>
+
+                <button type="button"
+                        id="cancelarEdicao"
+                        class="btn-secondary"
+                        style="display:none;">
+                    Cancelar edição
+                </button>
+
+            </div>
+
+        </form>
+
+
+        <p id="mensagem"
+           class="mensagem"></p>
+
+
+        <section class="agenda-list-card">
+
+            <div class="section-heading">
+
+                <h3>Tutores cadastrados</h3>
+
+                <p>
+                    Responsáveis registrados na plataforma.
+                </p>
+
+            </div>
+
+            <div id="tutoresList"></div>
+
+        </section>
+
+    </main>
 
 </div>
 
-<main class="content">
 
-    <header>
+<div id="modalExcluir"
+     class="modal-overlay"
+     style="display:none;">
 
-        <div>
-            <h1>Tutores</h1>
-            <p>Gerencie os tutores cadastrados.</p>
+    <div class="modal">
+
+        <div class="modal-icon">!</div>
+
+        <h3>Excluir tutor?</h3>
+
+        <p>
+            Esta ação não poderá ser desfeita.
+        </p>
+
+        <div class="modal-buttons">
+
+            <button id="cancelarExclusao"
+                    class="btn-cancelar">
+                Cancelar
+            </button>
+
+            <button id="confirmarExclusao"
+                    class="btn-excluir">
+                Excluir
+            </button>
+
         </div>
 
-        <div class="profile">
-            <span id="tipoUsuario">
-                Usuário
-            </span>
-        </div>
+    </div>
 
-    </header>
-
-    <section class="cards">
-
-        <div class="card">
-            <h3>Novo tutor</h3>
-            <p>
-                Cadastre um novo tutor no sistema.
-            </p>
-        </div>
-
-        <div class="card">
-            <h3>Consultar tutores</h3>
-            <p>
-                Visualize os tutores cadastrados.
-            </p>
-        </div>
-
-    </section>
-
-</main>
+</div>
 
 <script th:src="@{/js/dashboard.js}"></script>
+<script th:src="@{/js/tutores.js}"></script>
 
 </body>
 </html>
