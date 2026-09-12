@@ -52,17 +52,23 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
 
-                        // ROTAS PÚBLICAS
+                        // ROTAS PÚBLICAS DO FRONTEND
                         .requestMatchers(
                                 "/login",
-                                "/auth/**",
-                                "/error",
-
+                                "/web/**",
                                 "/css/**",
                                 "/js/**",
-                                "/img/**",
-                                "/dashboard",
+                                "/img/**"
+                        ).permitAll()
 
+                        // LOGIN E ERROS
+                        .requestMatchers(
+                                "/auth/**",
+                                "/error"
+                        ).permitAll()
+
+                        // SWAGGER
+                        .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"

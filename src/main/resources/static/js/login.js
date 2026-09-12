@@ -41,20 +41,21 @@ loginForm.addEventListener("submit", async function (event) {
 
         const data = await response.json();
 
-        // Guarda o JWT
+        // Salva o JWT
         localStorage.setItem(
             "token",
             data.token
         );
 
-        // Guarda o tipo do usuário
+        // Salva o perfil
         localStorage.setItem(
             "tipoUsuario",
             data.tipo
         );
 
-        // Vai para o dashboard
-        window.location.href = "/dashboard";
+        // Redireciona para o novo caminho
+        window.location.href =
+            "/web/dashboard";
 
     } catch (error) {
 

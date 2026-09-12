@@ -4,13 +4,17 @@ const token =
 const tipoUsuario =
     localStorage.getItem("tipoUsuario");
 
-// Se não estiver autenticado
+
+// VERIFICA LOGIN
+
 if (!token || !tipoUsuario) {
 
     window.location.href = "/login";
 }
 
-// Exibe o tipo de usuário
+
+// MOSTRA PERFIL
+
 const tipoUsuarioElement =
     document.getElementById("tipoUsuario");
 
@@ -20,7 +24,9 @@ if (tipoUsuarioElement) {
         tipoUsuario;
 }
 
-// Elementos exclusivos do veterinário
+
+// CONTROLE DE PERMISSÕES VISUAIS
+
 const menuTutores =
     document.getElementById("menuTutores");
 
@@ -33,7 +39,9 @@ const cardTutores =
 const cardVeterinarios =
     document.getElementById("cardVeterinarios");
 
-// Permissões de tela
+
+// TUTOR NÃO VÊ ÁREAS ADMINISTRATIVAS
+
 if (tipoUsuario === "TUTOR") {
 
     if (menuTutores) {
@@ -51,10 +59,11 @@ if (tipoUsuario === "TUTOR") {
     if (cardVeterinarios) {
         cardVeterinarios.style.display = "none";
     }
-
 }
 
-// Logout
+
+// LOGOUT
+
 const logoutButton =
     document.getElementById("logoutButton");
 

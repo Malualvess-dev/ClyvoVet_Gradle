@@ -5,57 +5,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>ClyvoVet - Tutores</title>
-    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+
+    <link rel="stylesheet"
+          th:href="@{/css/dashboard.css}">
 </head>
 
 <body>
 
 <div class="sidebar">
 
-    <div class="logo">ClyvoVet</div>
+    <div class="logo">
+        ClyvoVet
+    </div>
 
     <nav>
-        <a href="/dashboard">Início</a>
-        <a href="/agenda">Agenda</a>
-        <a href="/tutores" class="active">Tutores</a>
-        <a href="/veterinarios">Veterinários</a>
-        <a href="/anexos">Anexos</a>
-        <a href="/notificacoes">Notificações</a>
+
+        <a href="/web/dashboard">
+            Início
+        </a>
+
+        <a href="/web/agenda">
+            Agenda
+        </a>
+
+        <a href="/web/tutores"
+           id="menuTutores"
+           class="active">
+            Tutores
+        </a>
+
+        <a href="/web/veterinarios"
+           id="menuVeterinarios">
+            Veterinários
+        </a>
+
+        <a href="/web/anexos">
+            Anexos
+        </a>
+
+        <a href="/web/notificacoes">
+            Notificações
+        </a>
+
     </nav>
 
-    <button class="logout">Sair</button>
+    <button
+            id="logoutButton"
+            class="logout">
+        Sair
+    </button>
 
 </div>
 
 <main class="content">
 
     <header>
+
         <div>
             <h1>Tutores</h1>
             <p>Gerencie os tutores cadastrados.</p>
         </div>
 
         <div class="profile">
-            Usuário
+            <span id="tipoUsuario">
+                Usuário
+            </span>
         </div>
+
     </header>
 
     <section class="cards">
 
         <div class="card">
             <h3>Novo tutor</h3>
-            <p>Cadastre um novo tutor no sistema.</p>
+            <p>
+                Cadastre um novo tutor no sistema.
+            </p>
         </div>
 
         <div class="card">
             <h3>Consultar tutores</h3>
-            <p>Visualize os tutores cadastrados.</p>
+            <p>
+                Visualize os tutores cadastrados.
+            </p>
         </div>
 
     </section>
 
 </main>
+
+<script th:src="@{/js/dashboard.js}"></script>
 
 </body>
 </html>
