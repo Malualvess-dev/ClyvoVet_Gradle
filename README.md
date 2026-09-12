@@ -612,6 +612,9 @@ https://github.com/Malualvess-dev/ClyvoVet_Gradle
 **Maria Luiza Alves de Aquino**  
 RM561802
 
+**Natan Freitas De Moraes**  
+RM564992
+
 **João Victor Gomes de Souza**  
 RM560907
 
