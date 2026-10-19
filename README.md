@@ -2,6 +2,15 @@
 
 Aplicação web em **Spring Boot 4 + Thymeleaf** que conecta **tutores** e **veterinários**: o tutor cadastra seus pets e solicita consultas; o veterinário confirma ou recusa, registra o atendimento (prontuário e vacinas) e o tutor acompanha o histórico clínico e os reforços de vacina — com notificações automáticas em cada etapa.
 
+## Integrantes
+
+| Nome | RM |
+|---|---|
+| Maria Luiza Alves de Aquino | RM561802 |
+| Natan Freitas De Moraes | RM564992 |
+| João Victor Gomes de Souza | RM560907 |
+| Lucas Barranha Giannini | RM564508 |
+
 ## Sumário
 
 - [Tecnologias](#tecnologias)
