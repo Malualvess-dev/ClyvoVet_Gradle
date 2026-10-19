@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Meus pets')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('pets')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Meus pets</h1>
+                <p>Cadastre seus animais para agendar consultas e acompanhar o histórico clínico.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <div class="grade-2">
+            <section class="cartao">
+                <h2>Pets cadastrados</h2>
+                <p class="vazio" th:if="${pets.isEmpty()}">Você ainda não cadastrou nenhum pet.</p>
+                <ul class="lista">
+                    <li class="item" th:each="item : ${pets}">
+                        <div>
+                            <div class="item-titulo" th:text="${item.nome}">Nome</div>
+                            <div class="item-detalhe"
+                                 th:text="${item.especie.descricao} + (${item.raca} ? ' · ' + ${item.raca} : '') + ' · ' + ${item.pesoKg} + ' kg'">Detalhes</div>
+                        </div>
+                        <a class="botao botao-secundario botao-pequeno" th:href="@{/tutor/pets/{id}(id=${item.id})}">Prontuário</a>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="cartao">
+                <h2>Cadastrar novo pet</h2>
+                <form class="formulario" th:action="@{/tutor/pets}" th:object="${pet}" method="post" novalidate>
+                    <div th:replace="~{fragments/layout :: campo('nome', 'Nome', 'text')}"></div>
+                    <div class="linha">
+                        <div class="campo" th:classappend="${#fields.hasErrors('especie')} ? 'invalido'">
+                            <label for="especie">Espécie</label>
+                            <select th:field="*{especie}">
+                                <option value="">Selecione</option>
+                                <option th:each="especie : ${especies}" th:value="${especie}" th:text="${especie.descricao}">Espécie</option>
+                            </select>
+                            <span th:replace="~{fragments/layout :: erro('especie')}"></span>
+                        </div>
+                        <div th:replace="~{fragments/layout :: campo('raca', 'Raça (opcional)', 'text')}"></div>
+                    </div>
+                    <div class="linha">
+                        <div th:replace="~{fragments/layout :: campo('dataNascimento', 'Data de nascimento', 'date')}"></div>
+                        <div class="campo" th:classappend="${#fields.hasErrors('pesoKg')} ? 'invalido'">
+                            <label for="pesoKg">Peso (kg)</label>
+                            <input type="number" step="0.01" min="0.1" th:field="*{pesoKg}">
+                            <span th:replace="~{fragments/layout :: erro('pesoKg')}"></span>
+                        </div>
+                    </div>
+                    <button type="submit" class="botao">Cadastrar pet</button>
+                </form>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

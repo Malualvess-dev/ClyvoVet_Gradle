@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Solicitações')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('solicitacoes')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Solicitações de consulta</h1>
+                <p>Confirme ou recuse os pedidos dos tutores. O tutor é notificado automaticamente.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section th:replace="~{veterinario/fragmentos :: solicitacoes}"></section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Criar conta')}"></head>
+<body>
+<main class="publico">
+    <section class="publico-destaque">
+        <span class="marca-icone">🐾</span>
+        <h1>Crie sua conta no ClyvoVet.</h1>
+        <p>Depois do cadastro, você escolhe se é tutor ou veterinário e completa seu perfil.</p>
+    </section>
+
+    <section class="publico-formulario">
+        <div class="publico-caixa">
+            <h2>Criar conta</h2>
+            <p>Passo 1 de 2 · Dados de acesso</p>
+
+            <div th:replace="~{fragments/layout :: alertas}"></div>
+
+            <form class="formulario" th:action="@{/cadastro}" th:object="${conta}" method="post" novalidate>
+                <div th:replace="~{fragments/layout :: campo('nome', 'Nome completo', 'text')}"></div>
+                <div th:replace="~{fragments/layout :: campo('email', 'E-mail', 'email')}"></div>
+                <div class="campo" th:classappend="${#fields.hasErrors('senha')} ? 'invalido'">
+                    <label for="senha">Senha</label>
+                    <input type="password" th:field="*{senha}" autocomplete="new-password">
+                    <span class="dica">Mínimo de 8 caracteres, com maiúscula, minúscula e número.</span>
+                    <span th:replace="~{fragments/layout :: erro('senha')}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('senhasIguais')} ? 'invalido'">
+                    <label for="confirmacaoSenha">Confirme a senha</label>
+                    <input type="password" th:field="*{confirmacaoSenha}" autocomplete="new-password">
+                    <span th:replace="~{fragments/layout :: erro('confirmacaoSenha')}"></span>
+                    <span th:replace="~{fragments/layout :: erro('senhasIguais')}"></span>
+                </div>
+                <button type="submit" class="botao botao-largo">Continuar</button>
+            </form>
+
+            <p class="rodape-formulario">Já tem conta? <a th:href="@{/login}">Entrar</a></p>
+        </div>
+    </section>
+</main>
+</body>
+</html>

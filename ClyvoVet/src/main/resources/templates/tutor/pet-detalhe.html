@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head(${pet.nome})}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('pets')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <p><a th:href="@{/tutor/pets}">← Meus pets</a></p>
+                <h1 th:text="${pet.nome}">Pet</h1>
+                <p th:text="${pet.especie.descricao} + (${pet.raca} ? ' · ' + ${pet.raca} : '') + ' · nascido em ' + ${#temporals.format(pet.dataNascimento, 'dd/MM/yyyy')} + ' · ' + ${pet.pesoKg} + ' kg'">Detalhes</p>
+            </div>
+            <a class="botao" th:href="@{/tutor/consultas/nova(petId=${pet.id})}">+ Agendar consulta</a>
+        </header>
+
+        <div class="grade-2">
+            <section th:replace="~{fragments/historico :: historico-clinico}"></section>
+            <section th:replace="~{fragments/historico :: carteira-de-vacinacao}"></section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

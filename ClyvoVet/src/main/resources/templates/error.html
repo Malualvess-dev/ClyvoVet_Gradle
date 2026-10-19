@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Erro')}"></head>
+<body>
+<main class="pagina-simples">
+    <section class="cartao">
+        <h1>Algo deu errado</h1>
+        <br>
+        <p>Não foi possível concluir a operação. Tente novamente em instantes.</p>
+        <br>
+        <a class="botao" th:href="@{/painel}">Voltar ao início</a>
+    </section>
+</main>
+</body>
+</html>

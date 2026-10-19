@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Agendar consulta')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('nova-consulta')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Agendar consulta</h1>
+                <p>Atendimentos de segunda a sábado, das 08:00 às 18:00, com no mínimo 1 hora de antecedência.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section class="cartao" th:if="${pets.isEmpty()}">
+            <p class="vazio">Cadastre um pet antes de agendar uma consulta. <a th:href="@{/tutor/pets}">Cadastrar pet</a></p>
+        </section>
+
+        <th:block th:unless="${pets.isEmpty()}">
+            <section class="cartao">
+                <h2>1. Escolha o pet, o veterinário e a data</h2>
+                <form class="formulario" th:action="@{/tutor/consultas/nova}" th:object="${solicitacao}" method="get">
+                    <div class="linha">
+                        <div class="campo">
+                            <label for="petId">Pet</label>
+                            <select th:field="*{petId}" required>
+                                <option value="">Selecione</option>
+                                <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.nome}">Pet</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="veterinarioId">Veterinário</label>
+                            <select th:field="*{veterinarioId}" required>
+                                <option value="">Selecione</option>
+                                <option th:each="veterinario : ${veterinarios}" th:value="${veterinario.id}"
+                                        th:text="${veterinario.nome} + ' · ' + ${veterinario.especialidade}">Veterinário</option>
+                            </select>
+                        </div>
+                        <div class="campo">
+                            <label for="data">Data</label>
+                            <input type="date" th:field="*{data}" th:min="${#temporals.format(#temporals.createToday(), 'yyyy-MM-dd')}" required>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="botao botao-secundario">Ver horários disponíveis</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="cartao" th:if="${solicitacao.possuiVeterinarioEData()}">
+                <h2>2. Escolha o horário e descreva o motivo</h2>
+                <p class="vazio" th:if="${horarios.isEmpty()}">Não há horários disponíveis nesta data. Escolha outra data ou outro veterinário.</p>
+
+                <form class="formulario" th:unless="${horarios.isEmpty()}" th:action="@{/tutor/consultas}" th:object="${solicitacao}" method="post" novalidate>
+                    <input type="hidden" th:field="*{petId}">
+                    <input type="hidden" th:field="*{veterinarioId}">
+                    <input type="hidden" th:field="*{data}">
+                    <span th:replace="~{fragments/layout :: erro('petId')}"></span>
+                    <span th:replace="~{fragments/layout :: erro('data')}"></span>
+
+                    <div class="campo">
+                        <label>Horários livres em <span th:text="${#temporals.format(solicitacao.data, 'dd/MM/yyyy')}">data</span></label>
+                        <div class="horarios">
+                            <label class="horario" th:each="horario : ${horarios}">
+                                <input type="radio" th:field="*{horario}" th:value="${#temporals.format(horario, 'HH:mm')}">
+                                <span th:text="${#temporals.format(horario, 'HH:mm')}">08:00</span>
+                            </label>
+                        </div>
+                        <span th:replace="~{fragments/layout :: erro('horario')}"></span>
+                    </div>
+
+                    <div class="campo" th:classappend="${#fields.hasErrors('motivo')} ? 'invalido'">
+                        <label for="motivo">Motivo da consulta</label>
+                        <textarea th:field="*{motivo}" maxlength="250" placeholder="Ex.: vacinação anual, coceira persistente..."></textarea>
+                        <span th:replace="~{fragments/layout :: erro('motivo')}"></span>
+                    </div>
+
+                    <div>
+                        <button type="submit" class="botao">Solicitar consulta</button>
+                    </div>
+                </form>
+            </section>
+        </th:block>
+    </main>
+</div>
+</body>
+</html>

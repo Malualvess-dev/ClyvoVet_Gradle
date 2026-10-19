@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(titulo)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${titulo} + ' · ClyvoVet'">ClyvoVet</title>
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+
+<body>
+
+<aside th:fragment="menu(ativo)" class="menu">
+    <div>
+        <a class="marca" th:href="@{/painel}">
+            <span class="marca-icone">🐾</span>
+            <span>
+                <strong>ClyvoVet</strong>
+                <span th:text="${usuarioLogado.tutor} ? 'Área do tutor' : 'Área do veterinário'">Área</span>
+            </span>
+        </a>
+
+        <nav class="menu-links" th:if="${usuarioLogado.tutor}">
+            <a class="menu-link" th:classappend="${ativo == 'painel'} ? 'ativo'" th:href="@{/tutor/painel}">Início</a>
+            <a class="menu-link" th:classappend="${ativo == 'pets'} ? 'ativo'" th:href="@{/tutor/pets}">Meus pets</a>
+            <a class="menu-link" th:classappend="${ativo == 'consultas'} ? 'ativo'" th:href="@{/tutor/consultas}">Consultas</a>
+            <a class="menu-link" th:classappend="${ativo == 'nova-consulta'} ? 'ativo'" th:href="@{/tutor/consultas/nova}">Agendar consulta</a>
+            <a class="menu-link" th:classappend="${ativo == 'notificacoes'} ? 'ativo'" th:href="@{/notificacoes}">
+                Notificações
+                <span class="contador" th:if="${notificacoesNaoLidas > 0}" th:text="${notificacoesNaoLidas}">0</span>
+            </a>
+        </nav>
+
+        <nav class="menu-links" th:if="${usuarioLogado.veterinario}">
+            <a class="menu-link" th:classappend="${ativo == 'painel'} ? 'ativo'" th:href="@{/veterinario/painel}">Início</a>
+            <a class="menu-link" th:classappend="${ativo == 'solicitacoes'} ? 'ativo'" th:href="@{/veterinario/solicitacoes}">Solicitações</a>
+            <a class="menu-link" th:classappend="${ativo == 'agenda'} ? 'ativo'" th:href="@{/veterinario/agenda}">Agenda</a>
+            <a class="menu-link" th:classappend="${ativo == 'notificacoes'} ? 'ativo'" th:href="@{/notificacoes}">
+                Notificações
+                <span class="contador" th:if="${notificacoesNaoLidas > 0}" th:text="${notificacoesNaoLidas}">0</span>
+            </a>
+        </nav>
+    </div>
+
+    <div class="usuario-menu">
+        <small>Conectado como</small>
+        <strong th:text="${usuarioLogado.nome}">Usuário</strong>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="botao botao-secundario botao-largo">Sair</button>
+        </form>
+    </div>
+</aside>
+
+<div th:fragment="alertas">
+    <div class="alerta alerta-sucesso" role="status" th:if="${sucesso}" th:text="${sucesso}"></div>
+    <div class="alerta alerta-erro" role="alert" th:if="${erro}" th:text="${erro}"></div>
+</div>
+
+<div th:fragment="campo(nome, rotulo, tipo)" class="campo" th:classappend="${#fields.hasErrors(nome)} ? 'invalido'">
+    <label th:for="${nome}" th:text="${rotulo}">Campo</label>
+    <input th:type="${tipo}" th:field="*{__${nome}__}">
+    <span class="erro-campo" th:if="${#fields.hasErrors(nome)}" th:errors="*{__${nome}__}"></span>
+</div>
+
+<span th:fragment="erro(nome)" class="erro-campo" th:if="${#fields.hasErrors(nome)}" th:errors="*{__${nome}__}"></span>
+
+</body>
+</html>

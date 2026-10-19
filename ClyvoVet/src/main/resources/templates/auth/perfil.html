@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Completar cadastro')}"></head>
+<body>
+<main class="conteudo conteudo-centralizado">
+    <header class="cabecalho">
+        <div>
+            <p>Passo 2 de 2</p>
+            <h1 th:text="'Olá, ' + ${usuarioLogado.primeiroNome} + '! Como você vai usar o ClyvoVet?'">Olá!</h1>
+            <p>Escolha seu perfil e complete os dados. O perfil define quais áreas do sistema você pode acessar.</p>
+        </div>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit" class="botao botao-secundario">Sair</button>
+        </form>
+    </header>
+
+    <div th:replace="~{fragments/layout :: alertas}"></div>
+
+    <div class="grade-2">
+        <section class="cartao">
+            <h2>🐶 Sou tutor</h2>
+            <p class="item-detalhe">Cadastre seus pets, agende consultas e acompanhe o prontuário e as vacinas.</p>
+            <br>
+            <form class="formulario" th:action="@{/cadastro/perfil/tutor}" th:object="${tutor}" method="post" novalidate>
+                <div class="campo" th:classappend="${#fields.hasErrors('cpf')} ? 'invalido'">
+                    <label for="cpf">CPF</label>
+                    <input type="text" th:field="*{cpf}" placeholder="000.000.000-00" inputmode="numeric">
+                    <span th:replace="~{fragments/layout :: erro('cpf')}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('telefone')} ? 'invalido'">
+                    <label for="telefoneTutor">Telefone</label>
+                    <input type="tel" id="telefoneTutor" th:field="*{telefone}" placeholder="(11) 98765-4321">
+                    <span th:replace="~{fragments/layout :: erro('telefone')}"></span>
+                </div>
+                <button type="submit" class="botao">Continuar como tutor</button>
+            </form>
+        </section>
+
+        <section class="cartao">
+            <h2>🩺 Sou veterinário</h2>
+            <p class="item-detalhe">Receba solicitações, organize sua agenda e registre atendimentos e vacinas.</p>
+            <br>
+            <form class="formulario" th:action="@{/cadastro/perfil/veterinario}" th:object="${veterinario}" method="post" novalidate>
+                <div class="campo" th:classappend="${#fields.hasErrors('crmv')} ? 'invalido'">
+                    <label for="crmv">CRMV</label>
+                    <input type="text" th:field="*{crmv}" placeholder="CRMV-SP 12345">
+                    <span th:replace="~{fragments/layout :: erro('crmv')}"></span>
+                </div>
+                <div th:replace="~{fragments/layout :: campo('especialidade', 'Especialidade', 'text')}"></div>
+                <div class="campo" th:classappend="${#fields.hasErrors('telefone')} ? 'invalido'">
+                    <label for="telefoneVeterinario">Telefone</label>
+                    <input type="tel" id="telefoneVeterinario" th:field="*{telefone}" placeholder="(11) 3456-7890">
+                    <span th:replace="~{fragments/layout :: erro('telefone')}"></span>
+                </div>
+                <button type="submit" class="botao">Continuar como veterinário</button>
+            </form>
+        </section>
+    </div>
+</main>
+</body>
+</html>

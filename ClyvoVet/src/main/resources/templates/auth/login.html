@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Entrar')}"></head>
+<body>
+<main class="publico">
+    <section class="publico-destaque">
+        <span class="marca-icone">🐾</span>
+        <h1>Saúde pet organizada em um só lugar.</h1>
+        <p>O ClyvoVet conecta tutores e veterinários: agende consultas, acompanhe o prontuário e a carteira de vacinação do seu pet.</p>
+        <ul>
+            <li>✓ Agendamento com horários disponíveis em tempo real</li>
+            <li>✓ Prontuário e histórico clínico do pet</li>
+            <li>✓ Lembretes de reforço de vacinas</li>
+        </ul>
+    </section>
+
+    <section class="publico-formulario">
+        <div class="publico-caixa">
+            <h2>Entrar</h2>
+            <p>Acesse com seu e-mail ou com uma conta externa.</p>
+
+            <div class="alerta alerta-erro" role="alert" th:if="${param.erro}">E-mail ou senha inválidos.</div>
+            <div class="alerta alerta-erro" role="alert" th:if="${param.erroOAuth}">Não foi possível entrar com o provedor externo. Tente novamente.</div>
+            <div class="alerta alerta-sucesso" role="status" th:if="${param.saiu}">Você saiu da sua conta.</div>
+
+            <form class="formulario" th:action="@{/login}" method="post">
+                <div class="campo">
+                    <label for="email">E-mail</label>
+                    <input id="email" name="email" type="email" autocomplete="username" required autofocus>
+                </div>
+                <div class="campo">
+                    <label for="senha">Senha</label>
+                    <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+                </div>
+                <button type="submit" class="botao botao-largo">Entrar</button>
+            </form>
+
+            <th:block th:if="${!provedores.isEmpty()}">
+                <div class="separador">ou continue com</div>
+                <a class="botao-provedor" th:if="${provedores.contains('google')}" th:href="@{/oauth2/authorization/google}">
+                    <span aria-hidden="true">G</span> Entrar com Google
+                </a>
+                <a class="botao-provedor" th:if="${provedores.contains('github')}" th:href="@{/oauth2/authorization/github}">
+                    <span aria-hidden="true">⌥</span> Entrar com GitHub
+                </a>
+            </th:block>
+
+            <p class="rodape-formulario">Ainda não tem conta? <a th:href="@{/cadastro}">Cadastre-se</a></p>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Notificações')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('notificacoes')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Notificações</h1>
+                <p>Avisos gerados automaticamente a cada etapa das consultas.</p>
+            </div>
+            <form th:if="${notificacoesNaoLidas > 0}" th:action="@{/notificacoes/leitura}" method="post">
+                <button type="submit" class="botao botao-secundario">Marcar todas como lidas</button>
+            </form>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section class="cartao">
+            <p class="vazio" th:if="${notificacoes.isEmpty()}">Você não tem notificações.</p>
+            <ul class="lista">
+                <li class="item" th:each="notificacao : ${notificacoes}">
+                    <div>
+                        <div th:classappend="${notificacao.lida} ? 'item-detalhe' : 'item-titulo'" th:text="${notificacao.mensagem}">Mensagem</div>
+                        <div class="item-detalhe" th:text="${#temporals.format(notificacao.dataEnvio, 'dd/MM/yyyy HH:mm')}">Data</div>
+                    </div>
+                    <form th:unless="${notificacao.lida}" th:action="@{/notificacoes/{id}/leitura(id=${notificacao.id})}" method="post">
+                        <button type="submit" class="botao botao-secundario botao-pequeno">Marcar como lida</button>
+                    </form>
+                </li>
+            </ul>
+        </section>
+    </main>
+</div>
+</body>
+</html>

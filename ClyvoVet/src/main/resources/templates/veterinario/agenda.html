@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Agenda')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('agenda')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Agenda</h1>
+                <p>Registre o atendimento a partir do dia da consulta para concluir o prontuário.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section th:replace="~{veterinario/fragmentos :: agenda}"></section>
+    </main>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Início')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('painel')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <p>Área do veterinário</p>
+                <h1 th:text="'Olá, ' + ${usuarioLogado.nome} + '!'">Olá!</h1>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section class="grade">
+            <a class="cartao indicador cartao-link" th:href="@{/veterinario/solicitacoes}">
+                <span class="indicador-icone">📨</span>
+                <span><strong th:text="${solicitacoes.size()}">0</strong><span>solicitações pendentes</span></span>
+            </a>
+            <a class="cartao indicador cartao-link" th:href="@{/veterinario/agenda}">
+                <span class="indicador-icone">📅</span>
+                <span><strong th:text="${agenda.size()}">0</strong><span>consultas confirmadas</span></span>
+            </a>
+        </section>
+
+        <div class="grade-2">
+            <section th:replace="~{veterinario/fragmentos :: solicitacoes}"></section>
+            <section th:replace="~{veterinario/fragmentos :: agenda}"></section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

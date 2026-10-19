@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Início')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('painel')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <p>Área do tutor</p>
+                <h1 th:text="'Olá, ' + ${usuarioLogado.primeiroNome} + '!'">Olá!</h1>
+            </div>
+            <a class="botao" th:href="@{/tutor/consultas/nova}">+ Agendar consulta</a>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section class="grade">
+            <a class="cartao indicador cartao-link" th:href="@{/tutor/pets}">
+                <span class="indicador-icone">🐾</span>
+                <span><strong th:text="${pets.size()}">0</strong><span>pets cadastrados</span></span>
+            </a>
+            <a class="cartao indicador cartao-link" th:href="@{/tutor/consultas}">
+                <span class="indicador-icone">📅</span>
+                <span><strong th:text="${proximasConsultas.size()}">0</strong><span>consultas agendadas</span></span>
+            </a>
+            <div class="cartao indicador">
+                <span class="indicador-icone">💉</span>
+                <span><strong th:text="${reforcos.size()}">0</strong><span>reforços nos próximos 30 dias</span></span>
+            </div>
+        </section>
+
+        <div class="grade-2">
+            <section class="cartao">
+                <h2>Próximas consultas</h2>
+                <p class="vazio" th:if="${proximasConsultas.isEmpty()}">Nenhuma consulta agendada.</p>
+                <ul class="lista">
+                    <li class="item" th:each="consulta : ${proximasConsultas}">
+                        <div>
+                            <div class="item-titulo" th:text="${consulta.pet.nome} + ' · ' + ${consulta.veterinario.nome}">Pet</div>
+                            <div class="item-detalhe" th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')}">Data</div>
+                        </div>
+                        <span class="selo" th:classappend="'selo-' + ${consulta.status}" th:text="${consulta.status.descricao}">Status</span>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="cartao">
+                <h2>Reforços de vacina</h2>
+                <p class="vazio" th:if="${reforcos.isEmpty()}">Nenhum reforço previsto para os próximos 30 dias.</p>
+                <ul class="lista">
+                    <li class="item" th:each="vacina : ${reforcos}">
+                        <div>
+                            <div class="item-titulo" th:text="${vacina.nome}">Vacina</div>
+                            <div class="item-detalhe" th:text="${vacina.pet.nome}">Pet</div>
+                        </div>
+                        <span class="selo selo-SOLICITADA" th:text="${#temporals.format(vacina.proximaDose, 'dd/MM/yyyy')}">Data</span>
+                    </li>
+                </ul>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

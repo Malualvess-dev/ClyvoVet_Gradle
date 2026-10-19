@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Consultas')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('consultas')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Minhas consultas</h1>
+                <p>Acompanhe o andamento das solicitações. Consultas confirmadas podem ser canceladas até 24 horas antes.</p>
+            </div>
+            <a class="botao" th:href="@{/tutor/consultas/nova}">+ Agendar consulta</a>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section class="cartao">
+            <p class="vazio" th:if="${consultas.isEmpty()}">Você ainda não solicitou nenhuma consulta.</p>
+            <ul class="lista">
+                <li class="item" th:each="consulta : ${consultas}">
+                    <div>
+                        <div class="item-titulo"
+                             th:text="${consulta.pet.nome} + ' · ' + ${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')}">Consulta</div>
+                        <div class="item-detalhe" th:text="${consulta.veterinario.nome} + ' · ' + ${consulta.motivo}">Detalhes</div>
+                        <div class="item-detalhe" th:if="${consulta.justificativa}" th:text="'Justificativa: ' + ${consulta.justificativa}">Justificativa</div>
+                    </div>
+                    <div class="item-acoes">
+                        <span class="selo" th:classappend="'selo-' + ${consulta.status}" th:text="${consulta.status.descricao}">Status</span>
+                        <a class="botao botao-secundario botao-pequeno" th:if="${consulta.status.name() == 'CONCLUIDA'}"
+                           th:href="@{/tutor/pets/{id}(id=${consulta.pet.id})}">Ver prontuário</a>
+                        <details th:if="${consulta.podeSerCancelada(agora)}">
+                            <summary class="botao botao-perigo botao-pequeno">Cancelar</summary>
+                            <form class="acao-inline" th:action="@{/tutor/consultas/{id}/cancelamento(id=${consulta.id})}" method="post">
+                                <input type="text" name="justificativa" placeholder="Motivo do cancelamento"
+                                       aria-label="Motivo do cancelamento" required minlength="5" maxlength="250">
+                                <button type="submit" class="botao botao-perigo botao-pequeno">Confirmar</button>
+                            </form>
+                        </details>
+                    </div>
+                </li>
+            </ul>
+        </section>
+    </main>
+</div>
+</body>
+</html>

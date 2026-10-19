@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<section th:fragment="solicitacoes" class="cartao">
+    <h2>Solicitações aguardando resposta</h2>
+    <p class="vazio" th:if="${solicitacoes.isEmpty()}">Nenhuma solicitação pendente.</p>
+    <ul class="lista">
+        <li class="item" th:each="consulta : ${solicitacoes}">
+            <div>
+                <div class="item-titulo"
+                     th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie.descricao} + ')'">Consulta</div>
+                <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.pet.tutor.nome} + ' · ' + ${consulta.pet.tutor.telefone}">Tutor</div>
+                <div class="item-detalhe" th:text="'Motivo: ' + ${consulta.motivo}">Motivo</div>
+            </div>
+            <div class="item-acoes">
+                <form th:action="@{/veterinario/consultas/{id}/confirmacao(id=${consulta.id})}" method="post">
+                    <button type="submit" class="botao botao-pequeno">Confirmar</button>
+                </form>
+                <details>
+                    <summary class="botao botao-perigo botao-pequeno">Recusar</summary>
+                    <form class="acao-inline" th:action="@{/veterinario/consultas/{id}/recusa(id=${consulta.id})}" method="post">
+                        <input type="text" name="justificativa" placeholder="Motivo da recusa"
+                               aria-label="Motivo da recusa" required minlength="5" maxlength="250">
+                        <button type="submit" class="botao botao-perigo botao-pequeno">Enviar</button>
+                    </form>
+                </details>
+            </div>
+        </li>
+    </ul>
+</section>
+
+<section th:fragment="agenda" class="cartao">
+    <h2>Consultas confirmadas</h2>
+    <p class="vazio" th:if="${agenda.isEmpty()}">Nenhuma consulta confirmada.</p>
+    <ul class="lista">
+        <li class="item" th:each="consulta : ${agenda}">
+            <div>
+                <div class="item-titulo"
+                     th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie.descricao} + ')'">Consulta</div>
+                <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.pet.tutor.nome} + ' · ' + ${consulta.pet.tutor.telefone}">Tutor</div>
+                <div class="item-detalhe" th:text="'Motivo: ' + ${consulta.motivo}">Motivo</div>
+            </div>
+            <a class="botao botao-pequeno" th:href="@{/veterinario/consultas/{id}/atendimento(id=${consulta.id})}">Registrar atendimento</a>
+        </li>
+    </ul>
+</section>
+
+</body>
+</html>

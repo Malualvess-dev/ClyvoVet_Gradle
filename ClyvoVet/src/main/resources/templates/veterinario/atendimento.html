@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Atendimento')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('agenda')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <p><a th:href="@{/veterinario/agenda}">← Agenda</a></p>
+                <h1 th:text="'Atendimento de ' + ${consulta.pet.nome}">Atendimento</h1>
+                <p th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · Tutor: ' + ${consulta.pet.tutor.nome} + ' · Motivo: ' + ${consulta.motivo}">Detalhes</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <div class="grade-2">
+            <section class="cartao">
+                <h2>Prontuário</h2>
+                <p class="item-detalhe"
+                   th:text="${consulta.pet.especie.descricao} + (${consulta.pet.raca} ? ' · ' + ${consulta.pet.raca} : '') + ' · nascido em ' + ${#temporals.format(consulta.pet.dataNascimento, 'dd/MM/yyyy')} + ' · último peso: ' + ${consulta.pet.pesoKg} + ' kg'">Pet</p>
+                <br>
+                <form class="formulario" th:action="@{/veterinario/consultas/{id}/atendimento(id=${consulta.id})}"
+                      th:object="${atendimento}" method="post" novalidate>
+                    <div class="campo" th:classappend="${#fields.hasErrors('diagnostico')} ? 'invalido'">
+                        <label for="diagnostico">Diagnóstico</label>
+                        <textarea th:field="*{diagnostico}" maxlength="1000"></textarea>
+                        <span th:replace="~{fragments/layout :: erro('diagnostico')}"></span>
+                    </div>
+                    <div class="campo" th:classappend="${#fields.hasErrors('prescricao')} ? 'invalido'">
+                        <label for="prescricao">Prescrição (opcional)</label>
+                        <textarea th:field="*{prescricao}" maxlength="1000"></textarea>
+                        <span th:replace="~{fragments/layout :: erro('prescricao')}"></span>
+                    </div>
+                    <div class="campo" th:classappend="${#fields.hasErrors('pesoAferidoKg')} ? 'invalido'">
+                        <label for="pesoAferidoKg">Peso aferido (kg)</label>
+                        <input type="number" step="0.01" min="0.1" th:field="*{pesoAferidoKg}">
+                        <span class="dica">O peso do pet será atualizado com este valor.</span>
+                        <span th:replace="~{fragments/layout :: erro('pesoAferidoKg')}"></span>
+                    </div>
+                    <div class="linha">
+                        <div th:replace="~{fragments/layout :: campo('vacina', 'Vacina aplicada (opcional)', 'text')}"></div>
+                        <div class="campo" th:classappend="${#fields.hasErrors('proximaDose') or #fields.hasErrors('proximaDoseComVacina')} ? 'invalido'">
+                            <label for="proximaDose">Próxima dose (opcional)</label>
+                            <input type="date" th:field="*{proximaDose}">
+                            <span th:replace="~{fragments/layout :: erro('proximaDose')}"></span>
+                            <span th:replace="~{fragments/layout :: erro('proximaDoseComVacina')}"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="botao">Concluir atendimento</button>
+                    </div>
+                </form>
+            </section>
+
+            <div>
+                <section th:replace="~{fragments/historico :: historico-clinico}"></section>
+                <section th:replace="~{fragments/historico :: carteira-de-vacinacao}"></section>
+            </div>
+        </div>
+    </main>
+</div>
+</body>
+</html>
