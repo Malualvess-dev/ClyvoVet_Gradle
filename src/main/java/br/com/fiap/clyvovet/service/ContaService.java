@@ -1,6 +1,6 @@
 package br.com.fiap.clyvovet.service;
 
-import br.com.fiap.clyvovet.dto.CadastroContaForm;
+import br.com.fiap.clyvovet.dto.request.CadastroContaRequest;
 import br.com.fiap.clyvovet.exception.RecursoNaoEncontradoException;
 import br.com.fiap.clyvovet.exception.RegraNegocioException;
 import br.com.fiap.clyvovet.model.ProvedorLogin;
@@ -27,14 +27,14 @@ public class ContaService {
         this.relogio = relogio;
     }
 
-    public Usuario criarContaComSenha(CadastroContaForm form) {
-        String email = Usuario.normalizarEmail(form.getEmail());
+    public Usuario criarContaComSenha(CadastroContaRequest request) {
+        String email = Usuario.normalizarEmail(request.getEmail());
         if (usuarioRepository.existsByEmail(email)) {
             throw new RegraNegocioException("Já existe uma conta cadastrada com este e-mail.");
         }
-        String senhaCriptografada = codificadorDeSenha.encode(form.getSenha());
+        String senhaCriptografada = codificadorDeSenha.encode(request.getSenha());
         return usuarioRepository.save(
-                Usuario.comSenha(form.getNome(), email, senhaCriptografada, LocalDateTime.now(relogio)));
+                Usuario.comSenha(request.getNome(), email, senhaCriptografada, LocalDateTime.now(relogio)));
     }
 
     public Usuario obterOuCriarContaExterna(String nome, String email, ProvedorLogin provedor) {

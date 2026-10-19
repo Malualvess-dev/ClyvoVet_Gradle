@@ -1,6 +1,6 @@
 package br.com.fiap.clyvovet.service;
 
-import br.com.fiap.clyvovet.dto.AtendimentoForm;
+import br.com.fiap.clyvovet.dto.request.AtendimentoRequest;
 import br.com.fiap.clyvovet.model.Consulta;
 import br.com.fiap.clyvovet.model.Vacina;
 import br.com.fiap.clyvovet.repository.VacinaRepository;
@@ -27,11 +27,11 @@ public class AtendimentoService {
         this.relogio = relogio;
     }
 
-    public void registrar(Long usuarioVeterinarioId, Long consultaId, AtendimentoForm form) {
+    public void registrar(Long usuarioVeterinarioId, Long consultaId, AtendimentoRequest request) {
         Consulta consulta = consultaService.buscarDoVeterinario(usuarioVeterinarioId, consultaId);
-        consulta.concluir(form.prontuario(), LocalDateTime.now(relogio));
-        if (form.aplicouVacina()) {
-            vacinaRepository.save(Vacina.aplicadaEm(consulta, form.getVacina(), form.getProximaDose()));
+        consulta.concluir(request.prontuario(), LocalDateTime.now(relogio));
+        if (request.aplicouVacina()) {
+            vacinaRepository.save(Vacina.aplicadaEm(consulta, request.getVacina(), request.getProximaDose()));
         }
         notificacaoService.notificar(consulta.getPet().getTutor().getUsuario(),
                 "O atendimento de %s foi concluído. O prontuário já está disponível."

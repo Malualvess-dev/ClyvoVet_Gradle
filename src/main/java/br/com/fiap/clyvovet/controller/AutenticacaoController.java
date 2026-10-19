@@ -1,6 +1,6 @@
-package br.com.fiap.clyvovet.web;
+package br.com.fiap.clyvovet.controller;
 
-import br.com.fiap.clyvovet.dto.CadastroContaForm;
+import br.com.fiap.clyvovet.dto.request.CadastroContaRequest;
 import br.com.fiap.clyvovet.model.Usuario;
 import br.com.fiap.clyvovet.security.ProvedoresOAuth2;
 import br.com.fiap.clyvovet.security.SessaoDoUsuario;
@@ -38,17 +38,17 @@ public class AutenticacaoController {
     }
 
     @GetMapping("/cadastro")
-    public String cadastro(@ModelAttribute("conta") CadastroContaForm form) {
+    public String cadastro(@ModelAttribute("conta") CadastroContaRequest request) {
         return PAGINA_CADASTRO;
     }
 
     @PostMapping("/cadastro")
-    public String cadastrar(@Valid @ModelAttribute("conta") CadastroContaForm form, BindingResult validacao,
+    public String cadastrar(@Valid @ModelAttribute("conta") CadastroContaRequest request, BindingResult validacao,
                             HttpServletRequest requisicao, HttpServletResponse resposta) {
         if (validacao.hasErrors()) {
             return PAGINA_CADASTRO;
         }
-        Usuario usuario = contaService.criarContaComSenha(form);
+        Usuario usuario = contaService.criarContaComSenha(request);
         sessaoDoUsuario.autenticar(usuario, requisicao, resposta);
         return "redirect:/cadastro/perfil";
     }

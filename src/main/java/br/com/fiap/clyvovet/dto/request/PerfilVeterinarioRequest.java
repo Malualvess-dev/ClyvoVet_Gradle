@@ -1,10 +1,10 @@
-package br.com.fiap.clyvovet.dto;
+package br.com.fiap.clyvovet.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
-public class PerfilVeterinarioForm {
+public class PerfilVeterinarioRequest {
 
     @NotBlank(message = "Informe seu CRMV.")
     @Pattern(regexp = "^CRMV-[A-Z]{2} \\d{3,6}$", message = "Use o formato CRMV-UF 12345, ex.: CRMV-SP 12345.")

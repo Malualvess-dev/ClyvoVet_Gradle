@@ -1,6 +1,8 @@
 package br.com.fiap.clyvovet.service;
 
+import br.com.fiap.clyvovet.dto.response.ConsultaResponse;
 import br.com.fiap.clyvovet.exception.RecursoNaoEncontradoException;
+import br.com.fiap.clyvovet.mapper.ConsultaMapper;
 import br.com.fiap.clyvovet.model.Consulta;
 import br.com.fiap.clyvovet.model.StatusConsulta;
 import br.com.fiap.clyvovet.repository.ConsultaRepository;
@@ -16,39 +18,50 @@ import java.util.List;
 public class ConsultaService {
 
     private final ConsultaRepository consultaRepository;
+    private final ConsultaMapper consultaMapper;
     private final Clock relogio;
 
-    public ConsultaService(ConsultaRepository consultaRepository, Clock relogio) {
+    public ConsultaService(ConsultaRepository consultaRepository, ConsultaMapper consultaMapper, Clock relogio) {
         this.consultaRepository = consultaRepository;
+        this.consultaMapper = consultaMapper;
         this.relogio = relogio;
     }
 
-    public Consulta buscarDoVeterinario(Long usuarioVeterinarioId, Long consultaId) {
+    public ConsultaResponse detalharDoVeterinario(Long usuarioVeterinarioId, Long consultaId) {
+        return consultaMapper.paraResponse(buscarDoVeterinario(usuarioVeterinarioId, consultaId));
+    }
+
+    public List<ConsultaResponse> listarDoTutor(Long usuarioTutorId) {
+        return paraResponse(consultaRepository.findByPet_Tutor_Usuario_IdOrderByDataHoraDesc(usuarioTutorId));
+    }
+
+    public List<ConsultaResponse> proximasDoTutor(Long usuarioTutorId) {
+        return paraResponse(consultaRepository.findByPet_Tutor_Usuario_IdAndStatusInAndDataHoraAfterOrderByDataHoraAsc(
+                usuarioTutorId, StatusConsulta.queOcupamAgenda(), LocalDateTime.now(relogio)));
+    }
+
+    public List<ConsultaResponse> listarDoVeterinarioPorStatus(Long usuarioVeterinarioId, StatusConsulta status) {
+        return paraResponse(consultaRepository.findByVeterinario_Usuario_IdAndStatusOrderByDataHoraAsc(
+                usuarioVeterinarioId, status));
+    }
+
+    public List<ConsultaResponse> historicoClinico(Long petId) {
+        return paraResponse(consultaRepository.findByPet_IdAndStatusOrderByDataHoraDesc(
+                petId, StatusConsulta.CONCLUIDA));
+    }
+
+    Consulta buscarDoVeterinario(Long usuarioVeterinarioId, Long consultaId) {
         return consultaRepository.findByIdAndVeterinario_Usuario_Id(consultaId, usuarioVeterinarioId)
                 .orElseThrow(ConsultaService::consultaNaoEncontrada);
     }
 
-    public Consulta buscarDoTutor(Long usuarioTutorId, Long consultaId) {
+    Consulta buscarDoTutor(Long usuarioTutorId, Long consultaId) {
         return consultaRepository.findByIdAndPet_Tutor_Usuario_Id(consultaId, usuarioTutorId)
                 .orElseThrow(ConsultaService::consultaNaoEncontrada);
     }
 
-    public List<Consulta> listarDoTutor(Long usuarioTutorId) {
-        return consultaRepository.findByPet_Tutor_Usuario_IdOrderByDataHoraDesc(usuarioTutorId);
-    }
-
-    public List<Consulta> proximasDoTutor(Long usuarioTutorId) {
-        return consultaRepository.findByPet_Tutor_Usuario_IdAndStatusInAndDataHoraAfterOrderByDataHoraAsc(
-                usuarioTutorId, StatusConsulta.queOcupamAgenda(), LocalDateTime.now(relogio));
-    }
-
-    public List<Consulta> listarDoVeterinarioPorStatus(Long usuarioVeterinarioId, StatusConsulta status) {
-        return consultaRepository.findByVeterinario_Usuario_IdAndStatusOrderByDataHoraAsc(
-                usuarioVeterinarioId, status);
-    }
-
-    public List<Consulta> historicoClinico(Long petId) {
-        return consultaRepository.findByPet_IdAndStatusOrderByDataHoraDesc(petId, StatusConsulta.CONCLUIDA);
+    private List<ConsultaResponse> paraResponse(List<Consulta> consultas) {
+        return consultas.stream().map(consultaMapper::paraResponse).toList();
     }
 
     private static RecursoNaoEncontradoException consultaNaoEncontrada() {

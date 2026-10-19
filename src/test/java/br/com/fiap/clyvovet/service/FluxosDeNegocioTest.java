@@ -2,13 +2,14 @@ package br.com.fiap.clyvovet.service;
 
 import br.com.fiap.clyvovet.RelogioAjustavel;
 import br.com.fiap.clyvovet.RelogioDeTesteConfig;
-import br.com.fiap.clyvovet.dto.AtendimentoForm;
-import br.com.fiap.clyvovet.dto.SolicitacaoConsultaForm;
+import br.com.fiap.clyvovet.dto.request.AtendimentoRequest;
+import br.com.fiap.clyvovet.dto.request.SolicitacaoConsultaRequest;
+import br.com.fiap.clyvovet.dto.response.ConsultaResponse;
+import br.com.fiap.clyvovet.dto.response.PetResponse;
+import br.com.fiap.clyvovet.dto.response.VacinaResponse;
+import br.com.fiap.clyvovet.dto.response.VeterinarioResponse;
 import br.com.fiap.clyvovet.exception.RegraNegocioException;
-import br.com.fiap.clyvovet.model.Consulta;
-import br.com.fiap.clyvovet.model.Pet;
 import br.com.fiap.clyvovet.model.StatusConsulta;
-import br.com.fiap.clyvovet.model.Veterinario;
 import br.com.fiap.clyvovet.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -54,8 +55,8 @@ class FluxosDeNegocioTest {
 
     private Long tutora;
     private Long veterinaria;
-    private Pet thor;
-    private Veterinario draAna;
+    private PetResponse thor;
+    private VeterinarioResponse draAna;
 
     @BeforeEach
     void prepararDadosDeDemonstracao() {
@@ -63,24 +64,24 @@ class FluxosDeNegocioTest {
         tutora = idDoUsuario("carla@clyvovet.com");
         veterinaria = idDoUsuario("ana.vet@clyvovet.com");
         thor = petService.listarDoTutor(tutora).stream()
-                .filter(pet -> pet.getNome().equals("Thor")).findFirst().orElseThrow();
+                .filter(pet -> pet.nome().equals("Thor")).findFirst().orElseThrow();
         draAna = veterinarioService.listar().stream()
-                .filter(veterinario -> veterinario.getUsuario().getId().equals(veterinaria)).findFirst().orElseThrow();
+                .filter(veterinario -> veterinario.nome().equals("Dra. Ana Souza")).findFirst().orElseThrow();
     }
 
     @Test
     void fluxoDeAgendamentoReservaHorarioENotificaOsEnvolvidos() {
-        Consulta consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
 
-        assertThat(consulta.getStatus()).isEqualTo(StatusConsulta.SOLICITADA);
-        assertThat(agendamentoService.horariosDisponiveis(draAna.getId(), TERCA)).doesNotContain(DEZ_HORAS);
+        assertThat(consulta.status()).isEqualTo(StatusConsulta.SOLICITADA);
+        assertThat(agendamentoService.horariosDisponiveis(draAna.id(), TERCA)).doesNotContain(DEZ_HORAS);
         assertThat(notificacaoService.contarNaoLidas(veterinaria)).isEqualTo(1);
 
-        agendamentoService.confirmar(veterinaria, consulta.getId());
+        agendamentoService.confirmar(veterinaria, consulta.id());
 
-        assertThat(consulta.getStatus()).isEqualTo(StatusConsulta.CONFIRMADA);
+        assertThat(statusAtual(consulta)).isEqualTo(StatusConsulta.CONFIRMADA);
         assertThat(notificacaoService.contarNaoLidas(tutora)).isEqualTo(1);
-        assertThat(consultaService.proximasDoTutor(tutora)).extracting(Consulta::getId).contains(consulta.getId());
+        assertThat(consultaService.proximasDoTutor(tutora)).extracting(ConsultaResponse::id).contains(consulta.id());
     }
 
     @Test
@@ -94,63 +95,67 @@ class FluxosDeNegocioTest {
 
     @Test
     void cancelamentoDeConsultaConfirmadaRespeitaAntecedencia() {
-        Consulta consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
-        agendamentoService.confirmar(veterinaria, consulta.getId());
+        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        agendamentoService.confirmar(veterinaria, consulta.id());
         relogio.ajustarPara(LocalDateTime.of(2026, 10, 19, 11, 0));
 
-        assertThatThrownBy(() -> agendamentoService.cancelar(tutora, consulta.getId(), "Imprevisto no trabalho"))
+        assertThatThrownBy(() -> agendamentoService.cancelar(tutora, consulta.id(), "Imprevisto no trabalho"))
                 .isInstanceOf(RegraNegocioException.class);
     }
 
     @Test
     void veterinarioNaoAcessaConsultaDeOutroProfissional() {
-        Consulta consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
         Long outroVeterinario = idDoUsuario("bruno.vet@clyvovet.com");
 
-        assertThatThrownBy(() -> agendamentoService.confirmar(outroVeterinario, consulta.getId()))
+        assertThatThrownBy(() -> agendamentoService.confirmar(outroVeterinario, consulta.id()))
                 .hasMessageContaining("não encontrada");
     }
 
     @Test
     void fluxoDeAtendimentoConcluiProntuarioERegistraVacina() {
-        Consulta consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
-        agendamentoService.confirmar(veterinaria, consulta.getId());
+        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        agendamentoService.confirmar(veterinaria, consulta.id());
         relogio.ajustarPara(LocalDateTime.of(TERCA, LocalTime.of(10, 40)));
 
-        atendimentoService.registrar(veterinaria, consulta.getId(), atendimento("V8 (polivalente)", TERCA.plusDays(21)));
+        atendimentoService.registrar(veterinaria, consulta.id(), atendimento("V8 (polivalente)", TERCA.plusDays(21)));
 
-        assertThat(consulta.getStatus()).isEqualTo(StatusConsulta.CONCLUIDA);
-        assertThat(thor.getPesoKg()).isEqualByComparingTo("32.10");
-        assertThat(consultaService.historicoClinico(thor.getId())).extracting(Consulta::getId).contains(consulta.getId());
-        assertThat(vacinaService.reforcosProximos(tutora)).extracting(vacina -> vacina.getNome()).contains("V8 (polivalente)");
+        assertThat(statusAtual(consulta)).isEqualTo(StatusConsulta.CONCLUIDA);
+        assertThat(petService.detalharDoTutor(tutora, thor.id()).pesoKg()).isEqualByComparingTo("32.10");
+        assertThat(consultaService.historicoClinico(thor.id())).extracting(ConsultaResponse::id).contains(consulta.id());
+        assertThat(vacinaService.reforcosProximos(tutora)).extracting(VacinaResponse::nome).contains("V8 (polivalente)");
     }
 
     @Test
     void atendimentoExigeConsultaConfirmada() {
-        Consulta consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
         relogio.ajustarPara(LocalDateTime.of(TERCA, LocalTime.of(10, 40)));
 
-        assertThatThrownBy(() -> atendimentoService.registrar(veterinaria, consulta.getId(), atendimento(null, null)))
+        assertThatThrownBy(() -> atendimentoService.registrar(veterinaria, consulta.id(), atendimento(null, null)))
                 .isInstanceOf(RegraNegocioException.class);
     }
 
-    private SolicitacaoConsultaForm solicitacao(LocalDate data, LocalTime horario) {
-        SolicitacaoConsultaForm form = new SolicitacaoConsultaForm();
-        form.setPetId(thor.getId());
-        form.setVeterinarioId(draAna.getId());
-        form.setData(data);
-        form.setHorario(horario);
-        form.setMotivo("Vacinação e check-up");
-        return form;
+    private SolicitacaoConsultaRequest solicitacao(LocalDate data, LocalTime horario) {
+        SolicitacaoConsultaRequest request = new SolicitacaoConsultaRequest();
+        request.setPetId(thor.id());
+        request.setVeterinarioId(draAna.id());
+        request.setData(data);
+        request.setHorario(horario);
+        request.setMotivo("Vacinação e check-up");
+        return request;
     }
 
-    private AtendimentoForm atendimento(String vacina, LocalDate proximaDose) {
-        AtendimentoForm form = new AtendimentoForm();
-        form.setDiagnostico("Animal saudável.");
-        form.setPesoAferidoKg(new BigDecimal("32.10"));
-        form.setVacina(vacina);
-        form.setProximaDose(proximaDose);
-        return form;
+    private AtendimentoRequest atendimento(String vacina, LocalDate proximaDose) {
+        AtendimentoRequest request = new AtendimentoRequest();
+        request.setDiagnostico("Animal saudável.");
+        request.setPesoAferidoKg(new BigDecimal("32.10"));
+        request.setVacina(vacina);
+        request.setProximaDose(proximaDose);
+        return request;
+    }
+
+    private StatusConsulta statusAtual(ConsultaResponse consulta) {
+        return consultaService.detalharDoVeterinario(veterinaria, consulta.id()).status();
     }
 
     private Long idDoUsuario(String email) {

@@ -1,4 +1,4 @@
-package br.com.fiap.clyvovet.dto;
+package br.com.fiap.clyvovet.dto.request;
 
 import br.com.fiap.clyvovet.model.Prontuario;
 import jakarta.validation.constraints.AssertTrue;
@@ -13,7 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class AtendimentoForm {
+public class AtendimentoRequest {
 
     @NotBlank(message = "Descreva o diagnóstico.")
     @Size(max = 1000, message = "O diagnóstico deve ter no máximo 1000 caracteres.")

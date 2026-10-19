@@ -1,13 +1,13 @@
-package br.com.fiap.clyvovet.web.tutor;
+package br.com.fiap.clyvovet.controller.tutor;
 
-import br.com.fiap.clyvovet.dto.PetForm;
+import br.com.fiap.clyvovet.controller.Mensagens;
+import br.com.fiap.clyvovet.dto.request.PetRequest;
+import br.com.fiap.clyvovet.dto.response.PetResponse;
 import br.com.fiap.clyvovet.model.Especie;
-import br.com.fiap.clyvovet.model.Pet;
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import br.com.fiap.clyvovet.service.ConsultaService;
 import br.com.fiap.clyvovet.service.PetService;
 import br.com.fiap.clyvovet.service.VacinaService;
-import br.com.fiap.clyvovet.web.Mensagens;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -41,28 +41,28 @@ public class PetController {
 
     @GetMapping
     public String listar(@AuthenticationPrincipal UsuarioLogado usuario,
-                         @ModelAttribute("pet") PetForm form, Model model) {
+                         @ModelAttribute("pet") PetRequest request, Model model) {
         return exibirLista(usuario, model);
     }
 
     @PostMapping
     public String cadastrar(@AuthenticationPrincipal UsuarioLogado usuario,
-                            @Valid @ModelAttribute("pet") PetForm form, BindingResult validacao,
+                            @Valid @ModelAttribute("pet") PetRequest request, BindingResult validacao,
                             Model model, RedirectAttributes redirecionamento) {
         if (validacao.hasErrors()) {
             return exibirLista(usuario, model);
         }
-        Pet pet = petService.cadastrar(usuario.getId(), form);
-        redirecionamento.addFlashAttribute(Mensagens.SUCESSO, pet.getNome() + " foi cadastrado com sucesso.");
+        PetResponse pet = petService.cadastrar(usuario.getId(), request);
+        redirecionamento.addFlashAttribute(Mensagens.SUCESSO, pet.nome() + " foi cadastrado com sucesso.");
         return "redirect:/tutor/pets";
     }
 
     @GetMapping("/{id}")
     public String detalhar(@AuthenticationPrincipal UsuarioLogado usuario, @PathVariable Long id, Model model) {
-        Pet pet = petService.buscarDoTutor(usuario.getId(), id);
+        PetResponse pet = petService.detalharDoTutor(usuario.getId(), id);
         model.addAttribute("pet", pet);
-        model.addAttribute("historico", consultaService.historicoClinico(pet.getId()));
-        model.addAttribute("vacinas", vacinaService.carteiraDoPet(pet.getId()));
+        model.addAttribute("historico", consultaService.historicoClinico(pet.id()));
+        model.addAttribute("vacinas", vacinaService.carteiraDoPet(pet.id()));
         return "tutor/pet-detalhe";
     }
 

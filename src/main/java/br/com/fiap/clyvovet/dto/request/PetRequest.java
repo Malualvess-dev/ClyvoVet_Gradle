@@ -1,4 +1,4 @@
-package br.com.fiap.clyvovet.dto;
+package br.com.fiap.clyvovet.dto.request;
 
 import br.com.fiap.clyvovet.model.Especie;
 import jakarta.validation.constraints.DecimalMax;
@@ -13,7 +13,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public class PetForm {
+public class PetRequest {
 
     @NotBlank(message = "Informe o nome do pet.")
     @Size(max = 60, message = "O nome deve ter no máximo 60 caracteres.")

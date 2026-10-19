@@ -1,7 +1,7 @@
-package br.com.fiap.clyvovet.web;
+package br.com.fiap.clyvovet.controller;
 
-import br.com.fiap.clyvovet.dto.PerfilTutorForm;
-import br.com.fiap.clyvovet.dto.PerfilVeterinarioForm;
+import br.com.fiap.clyvovet.dto.request.PerfilTutorRequest;
+import br.com.fiap.clyvovet.dto.request.PerfilVeterinarioRequest;
 import br.com.fiap.clyvovet.model.Usuario;
 import br.com.fiap.clyvovet.security.SessaoDoUsuario;
 import br.com.fiap.clyvovet.security.UsuarioLogado;
@@ -37,13 +37,13 @@ public class PerfilController {
     }
 
     @ModelAttribute("tutor")
-    public PerfilTutorForm formularioTutor() {
-        return new PerfilTutorForm();
+    public PerfilTutorRequest formularioTutor() {
+        return new PerfilTutorRequest();
     }
 
     @ModelAttribute("veterinario")
-    public PerfilVeterinarioForm formularioVeterinario() {
-        return new PerfilVeterinarioForm();
+    public PerfilVeterinarioRequest formularioVeterinario() {
+        return new PerfilVeterinarioRequest();
     }
 
     @GetMapping
@@ -53,24 +53,24 @@ public class PerfilController {
 
     @PostMapping("/tutor")
     public String tornarTutor(@AuthenticationPrincipal UsuarioLogado usuario,
-                              @Valid @ModelAttribute("tutor") PerfilTutorForm form, BindingResult validacao,
+                              @Valid @ModelAttribute("tutor") PerfilTutorRequest request, BindingResult validacao,
                               Model model, HttpServletRequest requisicao, HttpServletResponse resposta) {
         if (validacao.hasErrors()) {
             return reexibir(model, "tutor");
         }
-        Usuario atualizado = tutorService.tornarTutor(usuario.getId(), form);
+        Usuario atualizado = tutorService.tornarTutor(usuario.getId(), request);
         return concluir(atualizado, requisicao, resposta);
     }
 
     @PostMapping("/veterinario")
     public String tornarVeterinario(@AuthenticationPrincipal UsuarioLogado usuario,
-                                    @Valid @ModelAttribute("veterinario") PerfilVeterinarioForm form,
+                                    @Valid @ModelAttribute("veterinario") PerfilVeterinarioRequest request,
                                     BindingResult validacao, Model model,
                                     HttpServletRequest requisicao, HttpServletResponse resposta) {
         if (validacao.hasErrors()) {
             return reexibir(model, "veterinario");
         }
-        Usuario atualizado = veterinarioService.tornarVeterinario(usuario.getId(), form);
+        Usuario atualizado = veterinarioService.tornarVeterinario(usuario.getId(), request);
         return concluir(atualizado, requisicao, resposta);
     }
 

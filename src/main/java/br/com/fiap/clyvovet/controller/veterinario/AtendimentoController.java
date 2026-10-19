@@ -1,12 +1,12 @@
-package br.com.fiap.clyvovet.web.veterinario;
+package br.com.fiap.clyvovet.controller.veterinario;
 
-import br.com.fiap.clyvovet.dto.AtendimentoForm;
-import br.com.fiap.clyvovet.model.Consulta;
+import br.com.fiap.clyvovet.controller.Mensagens;
+import br.com.fiap.clyvovet.dto.request.AtendimentoRequest;
+import br.com.fiap.clyvovet.dto.response.ConsultaResponse;
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import br.com.fiap.clyvovet.service.AtendimentoService;
 import br.com.fiap.clyvovet.service.ConsultaService;
 import br.com.fiap.clyvovet.service.VacinaService;
-import br.com.fiap.clyvovet.web.Mensagens;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -36,30 +36,30 @@ public class AtendimentoController {
 
     @GetMapping
     public String formulario(@AuthenticationPrincipal UsuarioLogado usuario, @PathVariable Long id,
-                             @ModelAttribute("atendimento") AtendimentoForm form, Model model) {
-        Consulta consulta = exibirConsulta(usuario, id, model);
-        form.setPesoAferidoKg(consulta.getPet().getPesoKg());
+                             @ModelAttribute("atendimento") AtendimentoRequest request, Model model) {
+        ConsultaResponse consulta = exibirConsulta(usuario, id, model);
+        request.setPesoAferidoKg(consulta.pet().pesoKg());
         return "veterinario/atendimento";
     }
 
     @PostMapping
     public String registrar(@AuthenticationPrincipal UsuarioLogado usuario, @PathVariable Long id,
-                            @Valid @ModelAttribute("atendimento") AtendimentoForm form, BindingResult validacao,
+                            @Valid @ModelAttribute("atendimento") AtendimentoRequest request, BindingResult validacao,
                             Model model, RedirectAttributes redirecionamento) {
         if (validacao.hasErrors()) {
             exibirConsulta(usuario, id, model);
             return "veterinario/atendimento";
         }
-        atendimentoService.registrar(usuario.getId(), id, form);
+        atendimentoService.registrar(usuario.getId(), id, request);
         redirecionamento.addFlashAttribute(Mensagens.SUCESSO, "Atendimento registrado e prontuário atualizado.");
         return "redirect:/veterinario/agenda";
     }
 
-    private Consulta exibirConsulta(UsuarioLogado usuario, Long consultaId, Model model) {
-        Consulta consulta = consultaService.buscarDoVeterinario(usuario.getId(), consultaId);
+    private ConsultaResponse exibirConsulta(UsuarioLogado usuario, Long consultaId, Model model) {
+        ConsultaResponse consulta = consultaService.detalharDoVeterinario(usuario.getId(), consultaId);
         model.addAttribute("consulta", consulta);
-        model.addAttribute("historico", consultaService.historicoClinico(consulta.getPet().getId()));
-        model.addAttribute("vacinas", vacinaService.carteiraDoPet(consulta.getPet().getId()));
+        model.addAttribute("historico", consultaService.historicoClinico(consulta.pet().id()));
+        model.addAttribute("vacinas", vacinaService.carteiraDoPet(consulta.pet().id()));
         return consulta;
     }
 }

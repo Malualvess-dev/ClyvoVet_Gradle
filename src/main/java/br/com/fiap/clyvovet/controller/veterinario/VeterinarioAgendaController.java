@@ -1,10 +1,10 @@
-package br.com.fiap.clyvovet.web.veterinario;
+package br.com.fiap.clyvovet.controller.veterinario;
 
+import br.com.fiap.clyvovet.controller.Mensagens;
 import br.com.fiap.clyvovet.model.StatusConsulta;
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import br.com.fiap.clyvovet.service.AgendamentoService;
 import br.com.fiap.clyvovet.service.ConsultaService;
-import br.com.fiap.clyvovet.web.Mensagens;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

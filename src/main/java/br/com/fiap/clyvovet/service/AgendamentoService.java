@@ -1,7 +1,9 @@
 package br.com.fiap.clyvovet.service;
 
-import br.com.fiap.clyvovet.dto.SolicitacaoConsultaForm;
+import br.com.fiap.clyvovet.dto.request.SolicitacaoConsultaRequest;
+import br.com.fiap.clyvovet.dto.response.ConsultaResponse;
 import br.com.fiap.clyvovet.exception.RegraNegocioException;
+import br.com.fiap.clyvovet.mapper.ConsultaMapper;
 import br.com.fiap.clyvovet.model.Consulta;
 import br.com.fiap.clyvovet.model.Pet;
 import br.com.fiap.clyvovet.model.StatusConsulta;
@@ -31,17 +33,20 @@ public class AgendamentoService {
     private final VeterinarioService veterinarioService;
     private final PoliticaDeAgendamento politica;
     private final NotificacaoService notificacaoService;
+    private final ConsultaMapper consultaMapper;
     private final Clock relogio;
 
     public AgendamentoService(ConsultaRepository consultaRepository, ConsultaService consultaService,
                               PetService petService, VeterinarioService veterinarioService,
-                              PoliticaDeAgendamento politica, NotificacaoService notificacaoService, Clock relogio) {
+                              PoliticaDeAgendamento politica, NotificacaoService notificacaoService,
+                              ConsultaMapper consultaMapper, Clock relogio) {
         this.consultaRepository = consultaRepository;
         this.consultaService = consultaService;
         this.petService = petService;
         this.veterinarioService = veterinarioService;
         this.politica = politica;
         this.notificacaoService = notificacaoService;
+        this.consultaMapper = consultaMapper;
         this.relogio = relogio;
     }
 
@@ -58,21 +63,21 @@ public class AgendamentoService {
                 .toList();
     }
 
-    public Consulta solicitar(Long usuarioTutorId, SolicitacaoConsultaForm form) {
-        Pet pet = petService.buscarDoTutor(usuarioTutorId, form.getPetId());
-        Veterinario veterinario = veterinarioService.buscar(form.getVeterinarioId());
-        LocalDateTime dataHora = form.dataHora();
+    public ConsultaResponse solicitar(Long usuarioTutorId, SolicitacaoConsultaRequest request) {
+        Pet pet = petService.buscarDoTutor(usuarioTutorId, request.getPetId());
+        Veterinario veterinario = veterinarioService.buscar(request.getVeterinarioId());
+        LocalDateTime dataHora = request.dataHora();
 
         politica.validar(dataHora);
         garantirHorarioLivre(veterinario, dataHora);
         garantirPetSemConsultaNoDia(pet, dataHora.toLocalDate());
 
         Consulta consulta = consultaRepository.save(
-                Consulta.solicitar(pet, veterinario, dataHora, form.getMotivo(), LocalDateTime.now(relogio)));
+                Consulta.solicitar(pet, veterinario, dataHora, request.getMotivo(), LocalDateTime.now(relogio)));
         notificacaoService.notificar(veterinario.getUsuario(),
                 "Nova solicitação: %s (%s) em %s.".formatted(pet.getNome(), pet.getTutor().getNome(),
                         dataHora.format(DATA_HORA)));
-        return consulta;
+        return consultaMapper.paraResponse(consulta);
     }
 
     public void confirmar(Long usuarioVeterinarioId, Long consultaId) {

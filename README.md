@@ -182,15 +182,23 @@ Regras (`AtendimentoService`, `Consulta` e `Vacina`):
 
 ```
 src/main/java/br/com/fiap/clyvovet
-├── config        # Relógio da aplicação (fuso America/Sao_Paulo)
-├── dto           # Formulários com Bean Validation
-├── exception     # RegraNegocioException, RecursoNaoEncontradoException
-├── model         # Entidades JPA com as regras de transição de status
-├── repository    # Spring Data JPA
-├── security      # SecurityConfig, OAuth2, usuário logado e sessão
-├── service       # Casos de uso (agendamento, atendimento, contas...)
-└── web           # Controllers MVC (tutor/, veterinario/) e tratamento global de erros
+├── config          # Relógio da aplicação (fuso America/Sao_Paulo)
+├── controller      # Controllers MVC
+│   ├── tutor/        # PetController, TutorConsultaController, TutorPainelController
+│   ├── veterinario/  # VeterinarioAgendaController, AtendimentoController
+│   └── advice/       # Dados globais das telas e tratamento de erros
+├── dto
+│   ├── request     # Dados recebidos dos formulários, com Bean Validation (*Request)
+│   └── response    # Dados enviados às telas (*Response, records imutáveis)
+├── exception       # RegraNegocioException, RecursoNaoEncontradoException
+├── mapper          # Conversão entidade → Response
+├── model           # Entidades JPA com as regras de transição de status
+├── repository      # Spring Data JPA
+├── security        # SecurityConfig, OAuth2, usuário logado e sessão
+└── service         # Casos de uso (agendamento, atendimento, contas...)
 ```
+
+Fluxo de uma requisição: **Controller** recebe o `*Request` validado → **Service** aplica as regras sobre as entidades (`model`) → **Mapper** converte para `*Response` → **Controller** entrega o response ao template Thymeleaf. As telas nunca recebem entidades JPA.
 
 Decisões de projeto:
 

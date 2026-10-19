@@ -1,4 +1,4 @@
-package br.com.fiap.clyvovet.dto;
+package br.com.fiap.clyvovet.dto.request;
 
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.Email;
@@ -8,7 +8,7 @@ import jakarta.validation.constraints.Size;
 
 import java.util.Objects;
 
-public class CadastroContaForm {
+public class CadastroContaRequest {
 
     @NotBlank(message = "Informe seu nome.")
     @Size(max = 100, message = "O nome deve ter no máximo 100 caracteres.")

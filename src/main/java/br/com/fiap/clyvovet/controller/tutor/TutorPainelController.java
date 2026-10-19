@@ -1,4 +1,4 @@
-package br.com.fiap.clyvovet.web.tutor;
+package br.com.fiap.clyvovet.controller.tutor;
 
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import br.com.fiap.clyvovet.service.ConsultaService;

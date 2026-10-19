@@ -1,6 +1,6 @@
 package br.com.fiap.clyvovet.service;
 
-import br.com.fiap.clyvovet.dto.PerfilTutorForm;
+import br.com.fiap.clyvovet.dto.request.PerfilTutorRequest;
 import br.com.fiap.clyvovet.exception.RecursoNaoEncontradoException;
 import br.com.fiap.clyvovet.exception.RegraNegocioException;
 import br.com.fiap.clyvovet.model.Perfil;
@@ -22,14 +22,14 @@ public class TutorService {
         this.contaService = contaService;
     }
 
-    public Usuario tornarTutor(Long usuarioId, PerfilTutorForm form) {
-        String cpf = form.getCpf().replaceAll("\\D", "");
+    public Usuario tornarTutor(Long usuarioId, PerfilTutorRequest request) {
+        String cpf = request.getCpf().replaceAll("\\D", "");
         if (tutorRepository.existsByCpf(cpf)) {
             throw new RegraNegocioException("Este CPF já está vinculado a outro tutor.");
         }
         Usuario usuario = contaService.buscar(usuarioId);
         usuario.definirPerfil(Perfil.TUTOR);
-        tutorRepository.save(new Tutor(usuario, cpf, form.getTelefone()));
+        tutorRepository.save(new Tutor(usuario, cpf, request.getTelefone()));
         return usuario;
     }
 

@@ -10,7 +10,7 @@
             <div>
                 <p><a th:href="@{/veterinario/agenda}">← Agenda</a></p>
                 <h1 th:text="'Atendimento de ' + ${consulta.pet.nome}">Atendimento</h1>
-                <p th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · Tutor: ' + ${consulta.pet.tutor.nome} + ' · Motivo: ' + ${consulta.motivo}">Detalhes</p>
+                <p th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · Tutor: ' + ${consulta.tutorNome} + ' · Motivo: ' + ${consulta.motivo}">Detalhes</p>
             </div>
         </header>
 

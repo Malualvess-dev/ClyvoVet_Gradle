@@ -23,14 +23,14 @@
                     <div>
                         <div class="item-titulo"
                              th:text="${consulta.pet.nome} + ' · ' + ${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')}">Consulta</div>
-                        <div class="item-detalhe" th:text="${consulta.veterinario.nome} + ' · ' + ${consulta.motivo}">Detalhes</div>
+                        <div class="item-detalhe" th:text="${consulta.veterinarioNome} + ' · ' + ${consulta.motivo}">Detalhes</div>
                         <div class="item-detalhe" th:if="${consulta.justificativa}" th:text="'Justificativa: ' + ${consulta.justificativa}">Justificativa</div>
                     </div>
                     <div class="item-acoes">
                         <span class="selo" th:classappend="'selo-' + ${consulta.status}" th:text="${consulta.status.descricao}">Status</span>
                         <a class="botao botao-secundario botao-pequeno" th:if="${consulta.status.name() == 'CONCLUIDA'}"
                            th:href="@{/tutor/pets/{id}(id=${consulta.pet.id})}">Ver prontuário</a>
-                        <details th:if="${consulta.podeSerCancelada(agora)}">
+                        <details th:if="${consulta.cancelavel}">
                             <summary class="botao botao-perigo botao-pequeno">Cancelar</summary>
                             <form class="acao-inline" th:action="@{/tutor/consultas/{id}/cancelamento(id=${consulta.id})}" method="post">
                                 <input type="text" name="justificativa" placeholder="Motivo do cancelamento"

@@ -1,4 +1,4 @@
-package br.com.fiap.clyvovet.web;
+package br.com.fiap.clyvovet.controller;
 
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

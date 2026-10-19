@@ -10,7 +10,7 @@
             <div>
                 <div class="item-titulo"
                      th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie.descricao} + ')'">Consulta</div>
-                <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.pet.tutor.nome} + ' · ' + ${consulta.pet.tutor.telefone}">Tutor</div>
+                <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.tutorNome} + ' · ' + ${consulta.tutorTelefone}">Tutor</div>
                 <div class="item-detalhe" th:text="'Motivo: ' + ${consulta.motivo}">Motivo</div>
             </div>
             <div class="item-acoes">
@@ -38,7 +38,7 @@
             <div>
                 <div class="item-titulo"
                      th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie.descricao} + ')'">Consulta</div>
-                <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.pet.tutor.nome} + ' · ' + ${consulta.pet.tutor.telefone}">Tutor</div>
+                <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.tutorNome} + ' · ' + ${consulta.tutorTelefone}">Tutor</div>
                 <div class="item-detalhe" th:text="'Motivo: ' + ${consulta.motivo}">Motivo</div>
             </div>
             <a class="botao botao-pequeno" th:href="@{/veterinario/consultas/{id}/atendimento(id=${consulta.id})}">Registrar atendimento</a>

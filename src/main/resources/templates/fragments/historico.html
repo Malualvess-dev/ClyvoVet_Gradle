@@ -10,7 +10,7 @@
             <div class="item-titulo"
                  th:text="${#temporals.format(atendimento.dataHora, 'dd/MM/yyyy')} + ' · ' + ${atendimento.motivo}">Atendimento</div>
             <div class="item-detalhe"
-                 th:text="${atendimento.veterinario.nome} + ' · Peso aferido: ' + ${atendimento.pesoAferidoKg} + ' kg'">Veterinário</div>
+                 th:text="${atendimento.veterinarioNome} + ' · Peso aferido: ' + ${atendimento.pesoAferidoKg} + ' kg'">Veterinário</div>
             <div class="prontuario">
                 <p><strong>Diagnóstico:</strong> <span th:text="${atendimento.diagnostico}">Diagnóstico</span></p>
                 <p th:if="${atendimento.prescricao}"><strong>Prescrição:</strong> <span th:text="${atendimento.prescricao}">Prescrição</span></p>

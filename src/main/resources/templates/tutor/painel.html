@@ -38,7 +38,7 @@
                 <ul class="lista">
                     <li class="item" th:each="consulta : ${proximasConsultas}">
                         <div>
-                            <div class="item-titulo" th:text="${consulta.pet.nome} + ' · ' + ${consulta.veterinario.nome}">Pet</div>
+                            <div class="item-titulo" th:text="${consulta.pet.nome} + ' · ' + ${consulta.veterinarioNome}">Pet</div>
                             <div class="item-detalhe" th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')}">Data</div>
                         </div>
                         <span class="selo" th:classappend="'selo-' + ${consulta.status}" th:text="${consulta.status.descricao}">Status</span>
@@ -53,7 +53,7 @@
                     <li class="item" th:each="vacina : ${reforcos}">
                         <div>
                             <div class="item-titulo" th:text="${vacina.nome}">Vacina</div>
-                            <div class="item-detalhe" th:text="${vacina.pet.nome}">Pet</div>
+                            <div class="item-detalhe" th:text="${vacina.petNome}">Pet</div>
                         </div>
                         <span class="selo selo-SOLICITADA" th:text="${#temporals.format(vacina.proximaDose, 'dd/MM/yyyy')}">Data</span>
                     </li>

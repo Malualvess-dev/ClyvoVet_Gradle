@@ -1,12 +1,12 @@
-package br.com.fiap.clyvovet.web.tutor;
+package br.com.fiap.clyvovet.controller.tutor;
 
-import br.com.fiap.clyvovet.dto.SolicitacaoConsultaForm;
+import br.com.fiap.clyvovet.controller.Mensagens;
+import br.com.fiap.clyvovet.dto.request.SolicitacaoConsultaRequest;
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import br.com.fiap.clyvovet.service.AgendamentoService;
 import br.com.fiap.clyvovet.service.ConsultaService;
 import br.com.fiap.clyvovet.service.PetService;
 import br.com.fiap.clyvovet.service.VeterinarioService;
-import br.com.fiap.clyvovet.web.Mensagens;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -20,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.time.Clock;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Controller
@@ -34,38 +32,35 @@ public class TutorConsultaController {
     private final AgendamentoService agendamentoService;
     private final PetService petService;
     private final VeterinarioService veterinarioService;
-    private final Clock relogio;
 
     public TutorConsultaController(ConsultaService consultaService, AgendamentoService agendamentoService,
-                                   PetService petService, VeterinarioService veterinarioService, Clock relogio) {
+                                   PetService petService, VeterinarioService veterinarioService) {
         this.consultaService = consultaService;
         this.agendamentoService = agendamentoService;
         this.petService = petService;
         this.veterinarioService = veterinarioService;
-        this.relogio = relogio;
     }
 
     @GetMapping
     public String listar(@AuthenticationPrincipal UsuarioLogado usuario, Model model) {
         model.addAttribute("consultas", consultaService.listarDoTutor(usuario.getId()));
-        model.addAttribute("agora", LocalDateTime.now(relogio));
         return "tutor/consultas";
     }
 
     @GetMapping("/nova")
     public String novaSolicitacao(@AuthenticationPrincipal UsuarioLogado usuario,
-                                  @ModelAttribute("solicitacao") SolicitacaoConsultaForm form, Model model) {
-        return exibirFormulario(usuario, form, model);
+                                  @ModelAttribute("solicitacao") SolicitacaoConsultaRequest request, Model model) {
+        return exibirFormulario(usuario, request, model);
     }
 
     @PostMapping
     public String solicitar(@AuthenticationPrincipal UsuarioLogado usuario,
-                            @Valid @ModelAttribute("solicitacao") SolicitacaoConsultaForm form,
+                            @Valid @ModelAttribute("solicitacao") SolicitacaoConsultaRequest request,
                             BindingResult validacao, Model model, RedirectAttributes redirecionamento) {
         if (validacao.hasErrors()) {
-            return exibirFormulario(usuario, form, model);
+            return exibirFormulario(usuario, request, model);
         }
-        agendamentoService.solicitar(usuario.getId(), form);
+        agendamentoService.solicitar(usuario.getId(), request);
         redirecionamento.addFlashAttribute(Mensagens.SUCESSO,
                 "Solicitação enviada! Você será notificado quando o veterinário responder.");
         return REDIRECIONAR_PARA_LISTA;
@@ -79,11 +74,11 @@ public class TutorConsultaController {
         return REDIRECIONAR_PARA_LISTA;
     }
 
-    private String exibirFormulario(UsuarioLogado usuario, SolicitacaoConsultaForm form, Model model) {
+    private String exibirFormulario(UsuarioLogado usuario, SolicitacaoConsultaRequest request, Model model) {
         model.addAttribute("pets", petService.listarDoTutor(usuario.getId()));
         model.addAttribute("veterinarios", veterinarioService.listar());
-        model.addAttribute("horarios", form.possuiVeterinarioEData()
-                ? agendamentoService.horariosDisponiveis(form.getVeterinarioId(), form.getData())
+        model.addAttribute("horarios", request.possuiVeterinarioEData()
+                ? agendamentoService.horariosDisponiveis(request.getVeterinarioId(), request.getData())
                 : List.of());
         return "tutor/nova-consulta";
     }

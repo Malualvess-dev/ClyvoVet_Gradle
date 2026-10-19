@@ -1,4 +1,4 @@
-package br.com.fiap.clyvovet.web;
+package br.com.fiap.clyvovet.controller;
 
 public final class Mensagens {
 

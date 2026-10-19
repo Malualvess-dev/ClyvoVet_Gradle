@@ -1,6 +1,8 @@
 package br.com.fiap.clyvovet.service;
 
+import br.com.fiap.clyvovet.dto.response.NotificacaoResponse;
 import br.com.fiap.clyvovet.exception.RecursoNaoEncontradoException;
+import br.com.fiap.clyvovet.mapper.NotificacaoMapper;
 import br.com.fiap.clyvovet.model.Notificacao;
 import br.com.fiap.clyvovet.model.Usuario;
 import br.com.fiap.clyvovet.repository.NotificacaoRepository;
@@ -16,10 +18,13 @@ import java.util.List;
 public class NotificacaoService {
 
     private final NotificacaoRepository notificacaoRepository;
+    private final NotificacaoMapper notificacaoMapper;
     private final Clock relogio;
 
-    public NotificacaoService(NotificacaoRepository notificacaoRepository, Clock relogio) {
+    public NotificacaoService(NotificacaoRepository notificacaoRepository, NotificacaoMapper notificacaoMapper,
+                              Clock relogio) {
         this.notificacaoRepository = notificacaoRepository;
+        this.notificacaoMapper = notificacaoMapper;
         this.relogio = relogio;
     }
 
@@ -28,8 +33,10 @@ public class NotificacaoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Notificacao> listar(Long usuarioId) {
-        return notificacaoRepository.findTop50ByUsuario_IdOrderByDataEnvioDesc(usuarioId);
+    public List<NotificacaoResponse> listar(Long usuarioId) {
+        return notificacaoRepository.findTop50ByUsuario_IdOrderByDataEnvioDesc(usuarioId).stream()
+                .map(notificacaoMapper::paraResponse)
+                .toList();
     }
 
     @Transactional(readOnly = true)

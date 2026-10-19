@@ -1,10 +1,10 @@
-package br.com.fiap.clyvovet.dto;
+package br.com.fiap.clyvovet.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import org.hibernate.validator.constraints.br.CPF;
 
-public class PerfilTutorForm {
+public class PerfilTutorRequest {
 
     @NotBlank(message = "Informe seu CPF.")
     @CPF(message = "Informe um CPF válido.")

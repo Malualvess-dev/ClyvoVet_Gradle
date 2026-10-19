@@ -1,4 +1,4 @@
-package br.com.fiap.clyvovet.dto;
+package br.com.fiap.clyvovet.dto.request;
 
 final class Telefone {
 
