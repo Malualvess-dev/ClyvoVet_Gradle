@@ -104,8 +104,12 @@ public class Consulta {
         status = StatusConsulta.CANCELADA;
     }
 
-    public void concluir(Prontuario prontuario, LocalDateTime agora) {
+    public void garantirQueAguardaAtendimento() {
         exigirStatus(StatusConsulta.CONFIRMADA);
+    }
+
+    public void concluir(Prontuario prontuario, LocalDateTime agora) {
+        garantirQueAguardaAtendimento();
         if (agora.toLocalDate().isBefore(dataHora.toLocalDate())) {
             throw new RegraNegocioException("O atendimento só pode ser registrado a partir do dia da consulta.");
         }

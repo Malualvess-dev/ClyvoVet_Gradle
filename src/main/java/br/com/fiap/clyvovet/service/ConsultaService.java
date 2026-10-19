@@ -31,6 +31,12 @@ public class ConsultaService {
         return consultaMapper.paraResponse(buscarDoVeterinario(usuarioVeterinarioId, consultaId));
     }
 
+    public ConsultaResponse detalharParaAtendimento(Long usuarioVeterinarioId, Long consultaId) {
+        Consulta consulta = buscarDoVeterinario(usuarioVeterinarioId, consultaId);
+        consulta.garantirQueAguardaAtendimento();
+        return consultaMapper.paraResponse(consulta);
+    }
+
     public List<ConsultaResponse> listarDoTutor(Long usuarioTutorId) {
         return paraResponse(consultaRepository.findByPet_Tutor_Usuario_IdOrderByDataHoraDesc(usuarioTutorId));
     }

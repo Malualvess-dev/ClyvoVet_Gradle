@@ -19,6 +19,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -91,6 +92,13 @@ class PaginasESegurancaTest {
     void tutorNaoAcessaAreaDoVeterinario() throws Exception {
         mockMvc.perform(get("/veterinario/solicitacoes").with(logadoComo("carla@clyvovet.com")))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void atendimentoDeConsultaJaConcluidaNaoAbre() throws Exception {
+        mockMvc.perform(get("/veterinario/consultas/1/atendimento").with(logadoComo("ana.vet@clyvovet.com")))
+                .andExpect(redirectedUrl("/painel"))
+                .andExpect(flash().attributeExists(Mensagens.ERRO));
     }
 
     @Test

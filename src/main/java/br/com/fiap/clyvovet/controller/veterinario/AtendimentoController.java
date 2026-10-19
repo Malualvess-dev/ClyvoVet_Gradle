@@ -56,7 +56,7 @@ public class AtendimentoController {
     }
 
     private ConsultaResponse exibirConsulta(UsuarioLogado usuario, Long consultaId, Model model) {
-        ConsultaResponse consulta = consultaService.detalharDoVeterinario(usuario.getId(), consultaId);
+        ConsultaResponse consulta = consultaService.detalharParaAtendimento(usuario.getId(), consultaId);
         model.addAttribute("consulta", consulta);
         model.addAttribute("historico", consultaService.historicoClinico(consulta.pet().id()));
         model.addAttribute("vacinas", vacinaService.carteiraDoPet(consulta.pet().id()));

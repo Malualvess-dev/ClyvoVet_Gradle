@@ -432,8 +432,14 @@ details[open] summary {
     gap: 10px;
 }
 
+.horario {
+    position: relative;
+}
+
 .horario input {
     position: absolute;
+    width: 1px;
+    height: 1px;
     opacity: 0;
 }
 
