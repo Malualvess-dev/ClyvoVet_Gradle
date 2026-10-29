@@ -1,30 +1,44 @@
 # =============================================================================
-# ClyvoVet - Criação dos recursos na Azure via Azure CLI
+# ClyvoVet - Criacao dos recursos na Azure via Azure CLI
 #
 # Cria: Grupo de recursos, Plano do App Service (Linux) e Web App Java 21,
-# já configurado para usar o Oracle da FIAP (perfil "oracle").
+# ja configurado para usar o Oracle da FIAP (perfil "oracle").
 #
-# Pré-requisitos:
+# Pre-requisitos:
 #   1. Azure CLI instalado e login feito com:  az login
-#   2. Variáveis de ambiente definidas NA SESSÃO do PowerShell (não ficam no Git):
+#   2. Variaveis de ambiente definidas NA SESSAO do PowerShell (nao ficam no Git):
 #        $env:DB_USERNAME="rmXXXXXX"
 #        $env:DB_PASSWORD="sua-senha"
 #        $env:GITHUB_CLIENT_ID="..."      $env:GITHUB_CLIENT_SECRET="..."
 #        $env:GOOGLE_CLIENT_ID="..."      $env:GOOGLE_CLIENT_SECRET="..."
 #
-# Uso:  .\infra\criar-recursos-azure.ps1
+# Uso:
+#   powershell -ExecutionPolicy Bypass -File .\infra\criar-recursos-azure.ps1
+#   powershell -ExecutionPolicy Bypass -File .\infra\criar-recursos-azure.ps1 -Location eastus
 # =============================================================================
+
+param(
+    [string]$Location = "eastus"   # troque se a regiao estiver sem capacidade
+)
 
 $ErrorActionPreference = "Stop"
 
 # ---- Nomes dos recursos -----------------------------------------------------
 $RESOURCE_GROUP = "rg-clyvovet"
-$LOCATION       = "eastus2"                 # troque se a assinatura bloquear a região
+$GROUP_LOCATION = "eastus2"
 $APP_PLAN       = "plan-clyvovet"
-$WEB_APP        = "clyvovet-rm561802"       # precisa ser único na Azure inteira
+$WEB_APP        = "clyvovet-rm561802"       # precisa ser unico na Azure inteira
 $SKU            = "B1"
 $RUNTIME        = "JAVA:21-java21"
 $DB_URL         = "jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL"
+
+# Interrompe o script assim que um comando do Azure CLI falhar.
+function Invoke-Az {
+    az @args
+    if ($LASTEXITCODE -ne 0) {
+        throw "Falha no comando: az $($args -join ' ')"
+    }
+}
 
 foreach ($variavel in "DB_USERNAME", "DB_PASSWORD") {
     if (-not (Test-Path "env:$variavel")) {
@@ -34,42 +48,48 @@ foreach ($variavel in "DB_USERNAME", "DB_PASSWORD") {
 
 # ---- 1. Grupo de recursos ---------------------------------------------------
 Write-Host "1/4 Criando o grupo de recursos $RESOURCE_GROUP..."
-az group create `
+# O grupo guarda so os metadados; a regiao dele nao precisa ser a mesma do plano.
+Invoke-Az group create `
     --name $RESOURCE_GROUP `
-    --location $LOCATION
+    --location $GROUP_LOCATION `
+    --output none
 
 # ---- 2. Plano do App Service (Linux) ----------------------------------------
-Write-Host "2/4 Criando o plano $APP_PLAN ($SKU, Linux)..."
-az appservice plan create `
+Write-Host "2/4 Criando o plano $APP_PLAN ($SKU, Linux, $Location)..."
+Invoke-Az appservice plan create `
     --name $APP_PLAN `
     --resource-group $RESOURCE_GROUP `
-    --location $LOCATION `
+    --location $Location `
     --is-linux `
-    --sku $SKU
+    --sku $SKU `
+    --output none
 
 # ---- 3. Web App Java 21 -----------------------------------------------------
 Write-Host "3/4 Criando o Web App $WEB_APP ($RUNTIME)..."
-az webapp create `
+Invoke-Az webapp create `
     --name $WEB_APP `
     --resource-group $RESOURCE_GROUP `
     --plan $APP_PLAN `
-    --runtime $RUNTIME
+    --runtime $RUNTIME `
+    --output none
 
-az webapp config set `
+Invoke-Az webapp config set `
     --name $WEB_APP `
     --resource-group $RESOURCE_GROUP `
     --always-on true `
-    --http20-enabled true
+    --http20-enabled true `
+    --output none
 
-az webapp update `
+Invoke-Az webapp update `
     --name $WEB_APP `
     --resource-group $RESOURCE_GROUP `
-    --https-only true
+    --https-only true `
+    --output none
 
-# ---- 4. Configurações da aplicação (variáveis de ambiente) -----------------
-# Os segredos vêm das variáveis da sessão: nada sensível fica neste arquivo.
-Write-Host "4/4 Configurando as variáveis de ambiente do Web App..."
-az webapp config appsettings set `
+# ---- 4. Configuracoes da aplicacao (variaveis de ambiente) ------------------
+# Os segredos vem das variaveis da sessao: nada sensivel fica neste arquivo.
+Write-Host "4/4 Configurando as variaveis de ambiente do Web App..."
+Invoke-Az webapp config appsettings set `
     --name $WEB_APP `
     --resource-group $RESOURCE_GROUP `
     --settings `
@@ -86,4 +106,4 @@ az webapp config appsettings set `
     --output none
 
 Write-Host ""
-Write-Host "Recursos criados. Endereço da aplicação: https://$WEB_APP.azurewebsites.net"
+Write-Host "Recursos criados com sucesso: https://$WEB_APP.azurewebsites.net"
