@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Documentos')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('documentos')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Documentos</h1>
+                <p>Exames, laudos e carteiras de vacinação guardados em um só lugar.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <div class="grade-2">
+            <section class="cartao">
+                <h2>Meus documentos</h2>
+                <p class="vazio" th:if="${documentos.isEmpty()}">Nenhum documento adicionado.</p>
+                <ul class="lista">
+                    <li class="item" th:each="item : ${documentos}">
+                        <div>
+                            <a class="item-titulo" th:href="${item.url}" target="_blank" rel="noopener" th:text="${item.nomeArquivo}">Arquivo</a>
+                            <div class="item-detalhe"
+                                 th:text="${item.tipoArquivo} + (${item.tamanhoKb} != null ? ' · ' + ${item.tamanhoKb} + ' KB' : '') + ' · ' + ${#temporals.format(item.dataCriacao, 'dd/MM/yyyy')}">Detalhes</div>
+                        </div>
+                        <details>
+                            <summary class="botao botao-perigo botao-pequeno">Remover</summary>
+                            <form class="acao-inline" th:action="@{/conta/documentos/{id}/exclusao(id=${item.id})}" method="post">
+                                <span class="item-detalhe">Remover este documento?</span>
+                                <button type="submit" class="botao botao-perigo botao-pequeno">Confirmar</button>
+                            </form>
+                        </details>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="cartao">
+                <h2>Adicionar documento</h2>
+                <form class="formulario" th:action="@{/conta/documentos}" th:object="${documento}" method="post" novalidate>
+                    <div th:replace="~{fragments/layout :: campo('nomeArquivo', 'Nome do arquivo', 'text')}"></div>
+                    <div class="linha">
+                        <div class="campo" th:classappend="${#fields.hasErrors('tipoArquivo')} ? 'invalido'">
+                            <label for="tipoArquivo">Tipo</label>
+                            <select th:field="*{tipoArquivo}">
+                                <option value="">Selecione</option>
+                                <option value="application/pdf">PDF</option>
+                                <option value="image/jpeg">Imagem JPG</option>
+                                <option value="image/png">Imagem PNG</option>
+                            </select>
+                            <span th:replace="~{fragments/layout :: erro('tipoArquivo')}"></span>
+                        </div>
+                        <div th:replace="~{fragments/layout :: campo('tamanhoKb', 'Tamanho em KB (opcional)', 'number')}"></div>
+                    </div>
+                    <div class="campo" th:classappend="${#fields.hasErrors('url')} ? 'invalido'">
+                        <label for="url">Link do arquivo</label>
+                        <input type="url" th:field="*{url}" placeholder="https://...">
+                        <span th:replace="~{fragments/layout :: erro('url')}"></span>
+                    </div>
+                    <button type="submit" class="botao">Adicionar</button>
+                </form>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

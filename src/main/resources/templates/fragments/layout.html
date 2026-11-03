@@ -35,10 +35,18 @@
             <a class="menu-link" th:classappend="${ativo == 'painel'} ? 'ativo'" th:href="@{/veterinario/painel}">Início</a>
             <a class="menu-link" th:classappend="${ativo == 'solicitacoes'} ? 'ativo'" th:href="@{/veterinario/solicitacoes}">Solicitações</a>
             <a class="menu-link" th:classappend="${ativo == 'agenda'} ? 'ativo'" th:href="@{/veterinario/agenda}">Agenda</a>
+            <a class="menu-link" th:classappend="${ativo == 'banco'} ? 'ativo'" th:href="@{/veterinario/banco}">Banco de dados</a>
             <a class="menu-link" th:classappend="${ativo == 'notificacoes'} ? 'ativo'" th:href="@{/notificacoes}">
                 Notificações
                 <span class="contador" th:if="${notificacoesNaoLidas > 0}" th:text="${notificacoesNaoLidas}">0</span>
             </a>
+        </nav>
+
+        <nav class="menu-links" aria-label="Minha conta">
+            <span class="menu-secao">Minha conta</span>
+            <a class="menu-link" th:classappend="${ativo == 'lembretes'} ? 'ativo'" th:href="@{/conta/lembretes}">Lembretes</a>
+            <a class="menu-link" th:classappend="${ativo == 'documentos'} ? 'ativo'" th:href="@{/conta/documentos}">Documentos</a>
+            <a class="menu-link" th:classappend="${ativo == 'endereco'} ? 'ativo'" th:href="@{/conta/endereco}">Endereço</a>
         </nav>
     </div>
 

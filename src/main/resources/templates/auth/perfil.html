@@ -32,6 +32,11 @@
                     <input type="tel" id="telefoneTutor" th:field="*{telefone}" placeholder="(11) 98765-4321">
                     <span th:replace="~{fragments/layout :: erro('telefone')}"></span>
                 </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('dataNascimento')} ? 'invalido'">
+                    <label for="nascimentoTutor">Data de nascimento</label>
+                    <input type="date" id="nascimentoTutor" th:field="*{dataNascimento}">
+                    <span th:replace="~{fragments/layout :: erro('dataNascimento')}"></span>
+                </div>
                 <button type="submit" class="botao">Continuar como tutor</button>
             </form>
         </section>
@@ -43,7 +48,7 @@
             <form class="formulario" th:action="@{/cadastro/perfil/veterinario}" th:object="${veterinario}" method="post" novalidate>
                 <div class="campo" th:classappend="${#fields.hasErrors('crmv')} ? 'invalido'">
                     <label for="crmv">CRMV</label>
-                    <input type="text" th:field="*{crmv}" placeholder="CRMV-SP 12345">
+                    <input type="text" th:field="*{crmv}" placeholder="CRMV-SP-12345">
                     <span th:replace="~{fragments/layout :: erro('crmv')}"></span>
                 </div>
                 <div th:replace="~{fragments/layout :: campo('especialidade', 'Especialidade', 'text')}"></div>
@@ -51,6 +56,11 @@
                     <label for="telefoneVeterinario">Telefone</label>
                     <input type="tel" id="telefoneVeterinario" th:field="*{telefone}" placeholder="(11) 3456-7890">
                     <span th:replace="~{fragments/layout :: erro('telefone')}"></span>
+                </div>
+                <div class="campo" th:classappend="${#fields.hasErrors('dataNascimento')} ? 'invalido'">
+                    <label for="nascimentoVeterinario">Data de nascimento</label>
+                    <input type="date" id="nascimentoVeterinario" th:field="*{dataNascimento}">
+                    <span th:replace="~{fragments/layout :: erro('dataNascimento')}"></span>
                 </div>
                 <button type="submit" class="botao">Continuar como veterinário</button>
             </form>

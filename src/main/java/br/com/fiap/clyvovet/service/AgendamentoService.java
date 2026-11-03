@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -72,11 +73,12 @@ public class AgendamentoService {
         garantirHorarioLivre(veterinario, dataHora);
         garantirPetSemConsultaNoDia(pet, dataHora.toLocalDate());
 
-        Consulta consulta = consultaRepository.save(
-                Consulta.solicitar(pet, veterinario, dataHora, request.getMotivo(), LocalDateTime.now(relogio)));
+        Consulta consulta = consultaRepository.save(Consulta.solicitar(pet, veterinario, dataHora,
+                request.getModalidade(), request.getMotivo(), LocalDateTime.now(relogio)));
         notificacaoService.notificar(veterinario.getUsuario(),
-                "Nova solicitação: %s (%s) em %s.".formatted(pet.getNome(), pet.getTutor().getNome(),
-                        dataHora.format(DATA_HORA)));
+                "Nova solicitação (%s): %s, de %s, em %s.".formatted(
+                        request.getModalidade().getDescricao().toLowerCase(Locale.ROOT), pet.getNome(),
+                        pet.getTutor().getNome(), dataHora.format(DATA_HORA)));
         return consultaMapper.paraResponse(consulta);
     }
 

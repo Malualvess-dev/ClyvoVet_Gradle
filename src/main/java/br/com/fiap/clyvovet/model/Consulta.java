@@ -1,7 +1,10 @@
 package br.com.fiap.clyvovet.model;
 
 import br.com.fiap.clyvovet.exception.RegraNegocioException;
+import br.com.fiap.clyvovet.model.conversor.StatusConsultaConverter;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -10,15 +13,16 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 
 @Entity
-@Table(name = "TB_CV_CONSULTA")
+@Table(name = "TB_CONSULTA")
 public class Consulta {
 
     static final Duration ANTECEDENCIA_MINIMA_CANCELAMENTO = Duration.ofHours(24);
@@ -26,9 +30,24 @@ public class Consulta {
     private static final int TAMANHO_MAXIMO_JUSTIFICATIVA = 250;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_CONSULTA")
+    @SequenceGenerator(name = "SEQ_CONSULTA", sequenceName = "SEQ_CONSULTA", allocationSize = 1)
     @Column(name = "ID_CONSULTA")
     private Long id;
+
+    @Column(name = "DATA_HORA", nullable = false)
+    private LocalDateTime dataHora;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "MODALIDADE", nullable = false, length = 15)
+    private Modalidade modalidade;
+
+    @Convert(converter = StatusConsultaConverter.class)
+    @Column(name = "STATUS", nullable = false, length = 15)
+    private StatusConsulta status;
+
+    @Column(name = "OBSERVACOES", length = 1000)
+    private String motivo;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_PET", nullable = false)
@@ -38,49 +57,32 @@ public class Consulta {
     @JoinColumn(name = "ID_VETERINARIO", nullable = false)
     private Veterinario veterinario;
 
-    @Column(name = "DATA_HORA", nullable = false)
-    private LocalDateTime dataHora;
-
-    @Column(name = "MOTIVO", nullable = false, length = 250)
-    private String motivo;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "STATUS", nullable = false, length = 20)
-    private StatusConsulta status;
-
     @Column(name = "JUSTIFICATIVA", length = 250)
     private String justificativa;
 
-    @Column(name = "DATA_CRIACAO", nullable = false)
-    private LocalDateTime dataCriacao;
+    @Column(name = "DATA_SOLICITACAO")
+    private LocalDateTime dataSolicitacao;
 
-    @Column(name = "DIAGNOSTICO", length = 1000)
-    private String diagnostico;
-
-    @Column(name = "PRESCRICAO", length = 1000)
-    private String prescricao;
-
-    @Column(name = "PESO_AFERIDO_KG", precision = 5, scale = 2)
-    private BigDecimal pesoAferidoKg;
-
-    @Column(name = "DATA_CONCLUSAO")
-    private LocalDateTime dataConclusao;
+    @OneToOne(mappedBy = "consulta", cascade = CascadeType.ALL)
+    private Prontuario prontuario;
 
     protected Consulta() {
     }
 
-    private Consulta(Pet pet, Veterinario veterinario, LocalDateTime dataHora, String motivo, LocalDateTime agora) {
+    private Consulta(Pet pet, Veterinario veterinario, LocalDateTime dataHora, Modalidade modalidade, String motivo,
+                     LocalDateTime agora) {
         this.pet = pet;
         this.veterinario = veterinario;
         this.dataHora = dataHora;
+        this.modalidade = modalidade;
         this.motivo = motivo.strip();
         this.status = StatusConsulta.SOLICITADA;
-        this.dataCriacao = agora;
+        this.dataSolicitacao = agora;
     }
 
-    public static Consulta solicitar(Pet pet, Veterinario veterinario, LocalDateTime dataHora,
+    public static Consulta solicitar(Pet pet, Veterinario veterinario, LocalDateTime dataHora, Modalidade modalidade,
                                      String motivo, LocalDateTime agora) {
-        return new Consulta(pet, veterinario, dataHora, motivo, agora);
+        return new Consulta(pet, veterinario, dataHora, modalidade, motivo, agora);
     }
 
     public void confirmar() {
@@ -108,17 +110,14 @@ public class Consulta {
         exigirStatus(StatusConsulta.CONFIRMADA);
     }
 
-    public void concluir(Prontuario prontuario, LocalDateTime agora) {
+    public void concluir(DadosDoAtendimento dados, LocalDateTime agora) {
         garantirQueAguardaAtendimento();
         if (agora.toLocalDate().isBefore(dataHora.toLocalDate())) {
             throw new RegraNegocioException("O atendimento só pode ser registrado a partir do dia da consulta.");
         }
-        diagnostico = prontuario.diagnostico().strip();
-        prescricao = prontuario.prescricao();
-        pesoAferidoKg = prontuario.pesoAferidoKg();
-        dataConclusao = agora;
+        prontuario = Prontuario.registrarPara(this, dados);
         status = StatusConsulta.CONCLUIDA;
-        pet.atualizarPeso(pesoAferidoKg);
+        pet.atualizarPeso(dados.pesoKg());
     }
 
     public boolean podeSerCancelada(LocalDateTime agora) {
@@ -151,6 +150,22 @@ public class Consulta {
         return id;
     }
 
+    public LocalDateTime getDataHora() {
+        return dataHora;
+    }
+
+    public Modalidade getModalidade() {
+        return modalidade;
+    }
+
+    public StatusConsulta getStatus() {
+        return status;
+    }
+
+    public String getMotivo() {
+        return motivo;
+    }
+
     public Pet getPet() {
         return pet;
     }
@@ -159,39 +174,15 @@ public class Consulta {
         return veterinario;
     }
 
-    public LocalDateTime getDataHora() {
-        return dataHora;
-    }
-
-    public String getMotivo() {
-        return motivo;
-    }
-
-    public StatusConsulta getStatus() {
-        return status;
-    }
-
     public String getJustificativa() {
         return justificativa;
     }
 
-    public LocalDateTime getDataCriacao() {
-        return dataCriacao;
+    public LocalDateTime getDataSolicitacao() {
+        return dataSolicitacao;
     }
 
-    public String getDiagnostico() {
-        return diagnostico;
-    }
-
-    public String getPrescricao() {
-        return prescricao;
-    }
-
-    public BigDecimal getPesoAferidoKg() {
-        return pesoAferidoKg;
-    }
-
-    public LocalDateTime getDataConclusao() {
-        return dataConclusao;
+    public Prontuario getProntuario() {
+        return prontuario;
     }
 }

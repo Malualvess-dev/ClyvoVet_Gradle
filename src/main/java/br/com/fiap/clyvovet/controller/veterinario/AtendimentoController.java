@@ -3,10 +3,11 @@ package br.com.fiap.clyvovet.controller.veterinario;
 import br.com.fiap.clyvovet.controller.Mensagens;
 import br.com.fiap.clyvovet.dto.request.AtendimentoRequest;
 import br.com.fiap.clyvovet.dto.response.ConsultaResponse;
+import br.com.fiap.clyvovet.model.TipoPrescricao;
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import br.com.fiap.clyvovet.service.AtendimentoService;
 import br.com.fiap.clyvovet.service.ConsultaService;
-import br.com.fiap.clyvovet.service.VacinaService;
+import br.com.fiap.clyvovet.service.HistoricoSaudeService;
 import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -23,15 +24,22 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/veterinario/consultas/{id}/atendimento")
 public class AtendimentoController {
 
+    private static final String PAGINA = "veterinario/atendimento";
+
     private final ConsultaService consultaService;
     private final AtendimentoService atendimentoService;
-    private final VacinaService vacinaService;
+    private final HistoricoSaudeService historicoSaudeService;
 
     public AtendimentoController(ConsultaService consultaService, AtendimentoService atendimentoService,
-                                 VacinaService vacinaService) {
+                                 HistoricoSaudeService historicoSaudeService) {
         this.consultaService = consultaService;
         this.atendimentoService = atendimentoService;
-        this.vacinaService = vacinaService;
+        this.historicoSaudeService = historicoSaudeService;
+    }
+
+    @ModelAttribute("tiposDePrescricao")
+    public TipoPrescricao[] tiposDePrescricao() {
+        return TipoPrescricao.values();
     }
 
     @GetMapping
@@ -39,7 +47,7 @@ public class AtendimentoController {
                              @ModelAttribute("atendimento") AtendimentoRequest request, Model model) {
         ConsultaResponse consulta = exibirConsulta(usuario, id, model);
         request.setPesoAferidoKg(consulta.pet().pesoKg());
-        return "veterinario/atendimento";
+        return PAGINA;
     }
 
     @PostMapping
@@ -48,7 +56,7 @@ public class AtendimentoController {
                             Model model, RedirectAttributes redirecionamento) {
         if (validacao.hasErrors()) {
             exibirConsulta(usuario, id, model);
-            return "veterinario/atendimento";
+            return PAGINA;
         }
         atendimentoService.registrar(usuario.getId(), id, request);
         redirecionamento.addFlashAttribute(Mensagens.SUCESSO, "Atendimento registrado e prontuário atualizado.");
@@ -59,7 +67,7 @@ public class AtendimentoController {
         ConsultaResponse consulta = consultaService.detalharParaAtendimento(usuario.getId(), consultaId);
         model.addAttribute("consulta", consulta);
         model.addAttribute("historico", consultaService.historicoClinico(consulta.pet().id()));
-        model.addAttribute("vacinas", vacinaService.carteiraDoPet(consulta.pet().id()));
+        model.addAttribute("historicoSaude", historicoSaudeService.doPet(consulta.pet().id()));
         return consulta;
     }
 }

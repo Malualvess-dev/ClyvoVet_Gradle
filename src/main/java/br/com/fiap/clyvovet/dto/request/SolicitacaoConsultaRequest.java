@@ -1,5 +1,6 @@
 package br.com.fiap.clyvovet.dto.request;
 
+import br.com.fiap.clyvovet.model.Modalidade;
 import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +27,9 @@ public class SolicitacaoConsultaRequest {
     @NotNull(message = "Selecione um horário disponível.")
     @DateTimeFormat(pattern = "HH:mm")
     private LocalTime horario;
+
+    @NotNull(message = "Escolha se a consulta será presencial ou online.")
+    private Modalidade modalidade = Modalidade.PRESENCIAL;
 
     @NotBlank(message = "Descreva o motivo da consulta.")
     @Size(min = 5, max = 250, message = "O motivo deve ter entre 5 e 250 caracteres.")
@@ -69,6 +73,14 @@ public class SolicitacaoConsultaRequest {
 
     public void setHorario(LocalTime horario) {
         this.horario = horario;
+    }
+
+    public Modalidade getModalidade() {
+        return modalidade;
+    }
+
+    public void setModalidade(Modalidade modalidade) {
+        this.modalidade = modalidade;
     }
 
     public String getMotivo() {

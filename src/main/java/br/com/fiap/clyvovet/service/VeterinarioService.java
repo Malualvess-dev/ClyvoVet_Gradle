@@ -35,14 +35,14 @@ public class VeterinarioService {
         }
         Usuario usuario = contaService.buscar(usuarioId);
         usuario.definirPerfil(Perfil.VETERINARIO);
-        veterinarioRepository.save(new Veterinario(usuario, request.getCrmv(),
-                request.getEspecialidade().strip(), request.getTelefone()));
+        veterinarioRepository.save(new Veterinario(usuario, request.getCrmv(), request.getEspecialidade().strip(),
+                request.getTelefone().strip(), request.getDataNascimento()));
         return usuario;
     }
 
     @Transactional(readOnly = true)
     public List<VeterinarioResponse> listar() {
-        return veterinarioRepository.findAllByOrderByUsuario_NomeAsc().stream()
+        return veterinarioRepository.findAllByOrderByNomeAsc().stream()
                 .map(veterinarioMapper::paraResponse)
                 .toList();
     }

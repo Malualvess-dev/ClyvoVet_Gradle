@@ -10,9 +10,10 @@ public interface NotificacaoRepository extends JpaRepository<Notificacao, Long> 
 
     List<Notificacao> findTop50ByUsuario_IdOrderByDataEnvioDesc(Long usuarioId);
 
-    List<Notificacao> findByUsuario_IdAndDataLeituraIsNull(Long usuarioId);
+    // O status "lida" é recebido como parâmetro para passar pelo conversor S/N da coluna LIDA.
+    List<Notificacao> findByUsuario_IdAndLida(Long usuarioId, boolean lida);
 
-    long countByUsuario_IdAndDataLeituraIsNull(Long usuarioId);
+    long countByUsuario_IdAndLida(Long usuarioId, boolean lida);
 
     Optional<Notificacao> findByIdAndUsuario_Id(Long notificacaoId, Long usuarioId);
 }

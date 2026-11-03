@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Banco de dados')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('banco')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Banco de dados</h1>
+                <p>Packages, função e trigger do Oracle executados pela aplicação a cada abertura desta página.</p>
+            </div>
+            <a class="botao botao-secundario" th:href="@{/veterinario/banco}">Executar novamente</a>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <div class="alerta alerta-info" role="status" th:unless="${oracleDisponivel}">
+            A aplicação está usando o H2 de desenvolvimento. Rode com o perfil <strong>oracle</strong> para executar as procedures.
+        </div>
+
+        <div class="grade-2">
+            <section class="cartao" th:with="resultado=${petsJson}">
+                <h2>Pets em JSON</h2>
+                <p class="item-detalhe" th:text="${resultado.procedimento}">Procedure</p>
+                <br>
+                <pre class="saida-banco" th:if="${resultado.sucesso}" th:text="${resultado.conteudo}">[]</pre>
+                <div class="alerta alerta-erro" th:unless="${resultado.sucesso}" th:text="${resultado.erro}">Erro</div>
+            </section>
+
+            <section class="cartao" th:with="resultado=${relatorioColeira}">
+                <h2>Relatório da coleira</h2>
+                <p class="item-detalhe" th:text="${resultado.procedimento}">Procedure</p>
+                <br>
+                <pre class="saida-banco" th:if="${resultado.sucesso}" th:text="${resultado.conteudo}">Relatório</pre>
+                <div class="alerta alerta-erro" th:unless="${resultado.sucesso}" th:text="${resultado.erro}">Erro</div>
+            </section>
+        </div>
+
+        <br>
+
+        <div class="grade-2">
+            <section class="cartao">
+                <h2>Simular leitura da coleira</h2>
+                <p class="item-detalhe">Grava em TB_COLEIRA. No Oracle, o trigger TRG_AUDITORIA_COLEIRA registra a operação ao lado.
+                    Acima de 140 bpm ou abaixo de 50 bpm a leitura gera alerta e notifica o tutor.</p>
+                <br>
+                <form class="formulario" th:action="@{/veterinario/banco/coleira}" th:object="${leitura}" method="post" novalidate>
+                    <div class="linha">
+                        <div class="campo" th:classappend="${#fields.hasErrors('petId')} ? 'invalido'">
+                            <label for="petId">Pet</label>
+                            <select th:field="*{petId}">
+                                <option value="">Selecione</option>
+                                <option th:each="pet : ${pets}" th:value="${pet.id}" th:text="${pet.nome} + ' · ' + ${pet.especie}">Pet</option>
+                            </select>
+                            <span th:replace="~{fragments/layout :: erro('petId')}"></span>
+                        </div>
+                        <div class="campo" th:classappend="${#fields.hasErrors('batimentoBpm')} ? 'invalido'">
+                            <label for="batimentoBpm">Batimentos (bpm)</label>
+                            <input type="number" step="0.1" min="10" max="400" th:field="*{batimentoBpm}">
+                            <span th:replace="~{fragments/layout :: erro('batimentoBpm')}"></span>
+                        </div>
+                    </div>
+                    <div>
+                        <button type="submit" class="botao">Gravar leitura</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="cartao">
+                <h2>Auditoria da coleira</h2>
+                <p class="item-detalhe">Últimos registros de TB_AUDITORIA_COLEIRA, gravados pelo trigger.</p>
+                <br>
+                <p class="vazio" th:if="${auditorias.isEmpty()}">Nenhum registro de auditoria.</p>
+                <div class="tabela-rolagem" th:unless="${auditorias.isEmpty()}">
+                    <table class="tabela">
+                        <thead>
+                        <tr>
+                            <th>Operação</th>
+                            <th>Leitura</th>
+                            <th>Batimentos</th>
+                            <th>Quando</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="registro : ${auditorias}">
+                            <td th:text="${registro.operacao}">INSERT</td>
+                            <td th:text="'nº ' + ${registro.idLeitura}">1</td>
+                            <td th:text="(${registro.batimentoAnterior} ?: '—') + ' → ' + (${registro.batimentoNovo} ?: '—')">85 → 90</td>
+                            <td th:text="${#temporals.format(registro.dataHora, 'dd/MM HH:mm:ss')}">Data</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <br>
+
+        <section class="cartao">
+            <h2>Erros registrados pelas procedures</h2>
+            <p class="item-detalhe">Últimos registros de TB_LOG_ERRO.</p>
+            <br>
+            <p class="vazio" th:if="${errosDoBanco.isEmpty()}">Nenhum erro registrado.</p>
+            <ul class="lista">
+                <li class="item item-bloco" th:each="erro : ${errosDoBanco}">
+                    <div class="item-titulo" th:text="${erro.procedimento} + ' · código ' + ${erro.codigo}">Procedure</div>
+                    <div class="item-detalhe" th:text="${erro.usuario} + ' · ' + ${#temporals.format(erro.dataErro, 'dd/MM/yyyy HH:mm')}">Usuário</div>
+                    <div class="item-detalhe" th:text="${erro.mensagem}">Mensagem</div>
+                </li>
+            </ul>
+        </section>
+    </main>
+</div>
+</body>
+</html>

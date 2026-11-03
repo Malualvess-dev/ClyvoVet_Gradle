@@ -23,13 +23,13 @@ public class TutorService {
     }
 
     public Usuario tornarTutor(Long usuarioId, PerfilTutorRequest request) {
-        String cpf = request.getCpf().replaceAll("\\D", "");
+        String cpf = formatarCpf(request.getCpf());
         if (tutorRepository.existsByCpf(cpf)) {
             throw new RegraNegocioException("Este CPF já está vinculado a outro tutor.");
         }
         Usuario usuario = contaService.buscar(usuarioId);
         usuario.definirPerfil(Perfil.TUTOR);
-        tutorRepository.save(new Tutor(usuario, cpf, request.getTelefone()));
+        tutorRepository.save(new Tutor(usuario, cpf, request.getTelefone().strip(), request.getDataNascimento()));
         return usuario;
     }
 
@@ -37,5 +37,12 @@ public class TutorService {
     public Tutor buscarPorUsuario(Long usuarioId) {
         return tutorRepository.findByUsuario_Id(usuarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Perfil de tutor não encontrado."));
+    }
+
+    /** O banco guarda o CPF no formato 000.000.000-00, como nos dados do grupo. */
+    static String formatarCpf(String cpf) {
+        String digitos = cpf.replaceAll("\\D", "");
+        return "%s.%s.%s-%s".formatted(digitos.substring(0, 3), digitos.substring(3, 6),
+                digitos.substring(6, 9), digitos.substring(9, 11));
     }
 }

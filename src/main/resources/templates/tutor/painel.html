@@ -52,7 +52,7 @@
                 <ul class="lista">
                     <li class="item" th:each="vacina : ${reforcos}">
                         <div>
-                            <div class="item-titulo" th:text="${vacina.nome}">Vacina</div>
+                            <div class="item-titulo" th:text="${vacina.evento}">Vacina</div>
                             <div class="item-detalhe" th:text="${vacina.petNome}">Pet</div>
                         </div>
                         <span class="selo selo-SOLICITADA" th:text="${#temporals.format(vacina.proximaDose, 'dd/MM/yyyy')}">Data</span>

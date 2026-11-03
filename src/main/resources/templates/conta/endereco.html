@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Endereço')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('endereco')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Endereço</h1>
+                <p>Usado para localizar a clínica mais próxima e como referência das leituras da coleira.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section class="cartao">
+            <form class="formulario" th:action="@{/conta/endereco}" th:object="${endereco}" method="post" novalidate>
+                <div class="linha">
+                    <div th:replace="~{fragments/layout :: campo('cep', 'CEP', 'text')}"></div>
+                    <div class="campo" th:classappend="${#fields.hasErrors('bairroId')} ? 'invalido'">
+                        <label for="bairroId">Bairro</label>
+                        <select th:field="*{bairroId}">
+                            <option value="">Selecione</option>
+                            <option th:each="bairro : ${bairros}" th:value="${bairro.id}" th:text="${bairro.descricao}">Bairro</option>
+                        </select>
+                        <span th:replace="~{fragments/layout :: erro('bairroId')}"></span>
+                    </div>
+                </div>
+                <div th:replace="~{fragments/layout :: campo('logradouro', 'Rua ou avenida', 'text')}"></div>
+                <div class="linha">
+                    <div th:replace="~{fragments/layout :: campo('numero', 'Número', 'text')}"></div>
+                    <div th:replace="~{fragments/layout :: campo('complemento', 'Complemento (opcional)', 'text')}"></div>
+                </div>
+                <div>
+                    <button type="submit" class="botao">Salvar endereço</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

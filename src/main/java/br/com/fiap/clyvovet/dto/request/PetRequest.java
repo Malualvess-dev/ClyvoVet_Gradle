@@ -1,6 +1,6 @@
 package br.com.fiap.clyvovet.dto.request;
 
-import br.com.fiap.clyvovet.model.Especie;
+import br.com.fiap.clyvovet.model.Sexo;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -8,6 +8,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Size;
+import org.hibernate.validator.constraints.URL;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.math.BigDecimal;
@@ -16,14 +17,14 @@ import java.time.LocalDate;
 public class PetRequest {
 
     @NotBlank(message = "Informe o nome do pet.")
-    @Size(max = 60, message = "O nome deve ter no máximo 60 caracteres.")
+    @Size(max = 50, message = "O nome deve ter no máximo 50 caracteres.")
     private String nome;
 
-    @NotNull(message = "Selecione a espécie.")
-    private Especie especie;
+    @NotNull(message = "Selecione a raça.")
+    private Long racaId;
 
-    @Size(max = 60, message = "A raça deve ter no máximo 60 caracteres.")
-    private String raca;
+    @NotNull(message = "Selecione o sexo.")
+    private Sexo sexo;
 
     @NotNull(message = "Informe a data de nascimento.")
     @PastOrPresent(message = "A data de nascimento não pode estar no futuro.")
@@ -31,10 +32,14 @@ public class PetRequest {
     private LocalDate dataNascimento;
 
     @NotNull(message = "Informe o peso.")
-    @DecimalMin(value = "0.1", message = "O peso deve ser de pelo menos 0,1 kg.")
+    @DecimalMin(value = "0.01", message = "O peso deve ser de pelo menos 0,01 kg.")
     @DecimalMax(value = "150.0", message = "O peso deve ser de no máximo 150 kg.")
     @Digits(integer = 3, fraction = 2, message = "Use no máximo duas casas decimais.")
     private BigDecimal pesoKg;
+
+    @URL(message = "Informe um endereço válido, começando com http:// ou https://.")
+    @Size(max = 255, message = "O link da foto deve ter no máximo 255 caracteres.")
+    private String fotoUrl;
 
     public String getNome() {
         return nome;
@@ -44,20 +49,20 @@ public class PetRequest {
         this.nome = nome;
     }
 
-    public Especie getEspecie() {
-        return especie;
+    public Long getRacaId() {
+        return racaId;
     }
 
-    public void setEspecie(Especie especie) {
-        this.especie = especie;
+    public void setRacaId(Long racaId) {
+        this.racaId = racaId;
     }
 
-    public String getRaca() {
-        return raca;
+    public Sexo getSexo() {
+        return sexo;
     }
 
-    public void setRaca(String raca) {
-        this.raca = raca;
+    public void setSexo(Sexo sexo) {
+        this.sexo = sexo;
     }
 
     public LocalDate getDataNascimento() {
@@ -74,5 +79,13 @@ public class PetRequest {
 
     public void setPesoKg(BigDecimal pesoKg) {
         this.pesoKg = pesoKg;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public void setFotoUrl(String fotoUrl) {
+        this.fotoUrl = fotoUrl;
     }
 }

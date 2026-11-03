@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface VeterinarioRepository extends JpaRepository<Veterinario, Long> {
 
-    List<Veterinario> findAllByOrderByUsuario_NomeAsc();
+    List<Veterinario> findAllByOrderByNomeAsc();
 
     boolean existsByCrmv(String crmv);
 }

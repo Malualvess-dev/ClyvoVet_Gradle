@@ -10,7 +10,7 @@
             <div>
                 <p><a th:href="@{/veterinario/agenda}">← Agenda</a></p>
                 <h1 th:text="'Atendimento de ' + ${consulta.pet.nome}">Atendimento</h1>
-                <p th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · Tutor: ' + ${consulta.tutorNome} + ' · Motivo: ' + ${consulta.motivo}">Detalhes</p>
+                <p th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.modalidade.descricao} + ' · Tutor: ' + ${consulta.tutorNome} + ' · Motivo: ' + ${consulta.motivo}">Detalhes</p>
             </div>
         </header>
 
@@ -20,30 +20,62 @@
             <section class="cartao">
                 <h2>Prontuário</h2>
                 <p class="item-detalhe"
-                   th:text="${consulta.pet.especie.descricao} + (${consulta.pet.raca} ? ' · ' + ${consulta.pet.raca} : '') + ' · nascido em ' + ${#temporals.format(consulta.pet.dataNascimento, 'dd/MM/yyyy')} + ' · último peso: ' + ${consulta.pet.pesoKg} + ' kg'">Pet</p>
+                   th:text="${consulta.pet.especie} + ' · ' + ${consulta.pet.raca} + ' · ' + ${consulta.pet.sexo.descricao} + ' · nascido em ' + ${#temporals.format(consulta.pet.dataNascimento, 'dd/MM/yyyy')} + (${consulta.pet.pesoKg} ? ' · último peso: ' + ${consulta.pet.pesoKg} + ' kg' : '')">Pet</p>
                 <br>
                 <form class="formulario" th:action="@{/veterinario/consultas/{id}/atendimento(id=${consulta.id})}"
                       th:object="${atendimento}" method="post" novalidate>
+                    <div class="campo" th:classappend="${#fields.hasErrors('sintomas')} ? 'invalido'">
+                        <label for="sintomas">Sintomas (opcional)</label>
+                        <textarea th:field="*{sintomas}" maxlength="250"></textarea>
+                        <span th:replace="~{fragments/layout :: erro('sintomas')}"></span>
+                    </div>
                     <div class="campo" th:classappend="${#fields.hasErrors('diagnostico')} ? 'invalido'">
                         <label for="diagnostico">Diagnóstico</label>
-                        <textarea th:field="*{diagnostico}" maxlength="1000"></textarea>
+                        <textarea th:field="*{diagnostico}" maxlength="500"></textarea>
                         <span th:replace="~{fragments/layout :: erro('diagnostico')}"></span>
                     </div>
-                    <div class="campo" th:classappend="${#fields.hasErrors('prescricao')} ? 'invalido'">
-                        <label for="prescricao">Prescrição (opcional)</label>
-                        <textarea th:field="*{prescricao}" maxlength="1000"></textarea>
-                        <span th:replace="~{fragments/layout :: erro('prescricao')}"></span>
-                    </div>
-                    <div class="campo" th:classappend="${#fields.hasErrors('pesoAferidoKg')} ? 'invalido'">
-                        <label for="pesoAferidoKg">Peso aferido (kg)</label>
-                        <input type="number" step="0.01" min="0.1" th:field="*{pesoAferidoKg}">
-                        <span class="dica">O peso do pet será atualizado com este valor.</span>
-                        <span th:replace="~{fragments/layout :: erro('pesoAferidoKg')}"></span>
+                    <div class="campo" th:classappend="${#fields.hasErrors('tratamento')} ? 'invalido'">
+                        <label for="tratamento">Tratamento (opcional)</label>
+                        <textarea th:field="*{tratamento}" maxlength="500"></textarea>
+                        <span th:replace="~{fragments/layout :: erro('tratamento')}"></span>
                     </div>
                     <div class="linha">
-                        <div th:replace="~{fragments/layout :: campo('vacina', 'Vacina aplicada (opcional)', 'text')}"></div>
+                        <div class="campo" th:classappend="${#fields.hasErrors('pesoAferidoKg')} ? 'invalido'">
+                            <label for="pesoAferidoKg">Peso aferido (kg)</label>
+                            <input type="number" step="0.01" min="0.01" th:field="*{pesoAferidoKg}">
+                            <span class="dica">O peso do pet será atualizado com este valor.</span>
+                            <span th:replace="~{fragments/layout :: erro('pesoAferidoKg')}"></span>
+                        </div>
+                        <div class="campo" th:classappend="${#fields.hasErrors('temperatura')} ? 'invalido'">
+                            <label for="temperatura">Temperatura (°C, opcional)</label>
+                            <input type="number" step="0.1" min="30" max="45" th:field="*{temperatura}">
+                            <span th:replace="~{fragments/layout :: erro('temperatura')}"></span>
+                        </div>
+                    </div>
+                    <div class="linha">
+                        <div th:replace="~{fragments/layout :: campo('examesSolicitados', 'Exames solicitados (opcional)', 'text')}"></div>
+                        <div th:replace="~{fragments/layout :: campo('dataRetorno', 'Data de retorno (opcional)', 'date')}"></div>
+                    </div>
+
+                    <h3>Prescrição (opcional)</h3>
+                    <div class="linha">
+                        <div class="campo" th:classappend="${#fields.hasErrors('tipoPrescricao') or #fields.hasErrors('prescricaoComTipo')} ? 'invalido'">
+                            <label for="tipoPrescricao">Tipo</label>
+                            <select th:field="*{tipoPrescricao}">
+                                <option value="">Selecione</option>
+                                <option th:each="tipo : ${tiposDePrescricao}" th:value="${tipo}" th:text="${tipo.descricao}">Tipo</option>
+                            </select>
+                            <span th:replace="~{fragments/layout :: erro('prescricaoComTipo')}"></span>
+                        </div>
+                        <div th:replace="~{fragments/layout :: campo('prescricao', 'Descrição', 'text')}"></div>
+                    </div>
+                    <div th:replace="~{fragments/layout :: campo('posologia', 'Posologia', 'text')}"></div>
+
+                    <h3>Vacina (opcional)</h3>
+                    <div class="linha">
+                        <div th:replace="~{fragments/layout :: campo('vacina', 'Vacina aplicada', 'text')}"></div>
                         <div class="campo" th:classappend="${#fields.hasErrors('proximaDose') or #fields.hasErrors('proximaDoseComVacina')} ? 'invalido'">
-                            <label for="proximaDose">Próxima dose (opcional)</label>
+                            <label for="proximaDose">Próxima dose</label>
                             <input type="date" th:field="*{proximaDose}">
                             <span th:replace="~{fragments/layout :: erro('proximaDose')}"></span>
                             <span th:replace="~{fragments/layout :: erro('proximaDoseComVacina')}"></span>
@@ -57,7 +89,8 @@
 
             <div>
                 <section th:replace="~{fragments/historico :: historico-clinico}"></section>
-                <section th:replace="~{fragments/historico :: carteira-de-vacinacao}"></section>
+                <br>
+                <section th:replace="~{fragments/historico :: historico-de-saude}"></section>
             </div>
         </div>
     </main>

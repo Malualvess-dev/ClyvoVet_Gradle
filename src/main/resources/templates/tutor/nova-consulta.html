@@ -9,7 +9,7 @@
         <header class="cabecalho">
             <div>
                 <h1>Agendar consulta</h1>
-                <p>Atendimentos de segunda a sábado, das 08:00 às 18:00, com no mínimo 1 hora de antecedência.</p>
+                <p>Atendimentos de segunda a sábado, das 08:00 às 17:30, com no mínimo 1 hora de antecedência.</p>
             </div>
         </header>
 
@@ -70,6 +70,17 @@
                             </label>
                         </div>
                         <span th:replace="~{fragments/layout :: erro('horario')}"></span>
+                    </div>
+
+                    <div class="campo" th:classappend="${#fields.hasErrors('modalidade')} ? 'invalido'">
+                        <label>Modalidade</label>
+                        <div class="horarios">
+                            <label class="horario" th:each="modalidade : ${modalidades}">
+                                <input type="radio" th:field="*{modalidade}" th:value="${modalidade}">
+                                <span th:text="${modalidade.descricao}">Presencial</span>
+                            </label>
+                        </div>
+                        <span th:replace="~{fragments/layout :: erro('modalidade')}"></span>
                     </div>
 
                     <div class="campo" th:classappend="${#fields.hasErrors('motivo')} ? 'invalido'">

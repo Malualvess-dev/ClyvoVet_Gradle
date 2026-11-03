@@ -9,7 +9,7 @@
         <li class="item" th:each="consulta : ${solicitacoes}">
             <div>
                 <div class="item-titulo"
-                     th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie.descricao} + ')'">Consulta</div>
+                     th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie} + ', ' + ${consulta.modalidade.descricao.toLowerCase()} + ')'">Consulta</div>
                 <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.tutorNome} + ' · ' + ${consulta.tutorTelefone}">Tutor</div>
                 <div class="item-detalhe" th:text="'Motivo: ' + ${consulta.motivo}">Motivo</div>
             </div>
@@ -37,7 +37,7 @@
         <li class="item" th:each="consulta : ${agenda}">
             <div>
                 <div class="item-titulo"
-                     th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie.descricao} + ')'">Consulta</div>
+                     th:text="${#temporals.format(consulta.dataHora, 'dd/MM/yyyy HH:mm')} + ' · ' + ${consulta.pet.nome} + ' (' + ${consulta.pet.especie} + ', ' + ${consulta.modalidade.descricao.toLowerCase()} + ')'">Consulta</div>
                 <div class="item-detalhe" th:text="'Tutor: ' + ${consulta.tutorNome} + ' · ' + ${consulta.tutorTelefone}">Tutor</div>
                 <div class="item-detalhe" th:text="'Motivo: ' + ${consulta.motivo}">Motivo</div>
             </div>

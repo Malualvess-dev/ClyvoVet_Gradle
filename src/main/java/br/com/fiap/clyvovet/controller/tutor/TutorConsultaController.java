@@ -2,6 +2,7 @@ package br.com.fiap.clyvovet.controller.tutor;
 
 import br.com.fiap.clyvovet.controller.Mensagens;
 import br.com.fiap.clyvovet.dto.request.SolicitacaoConsultaRequest;
+import br.com.fiap.clyvovet.model.Modalidade;
 import br.com.fiap.clyvovet.security.UsuarioLogado;
 import br.com.fiap.clyvovet.service.AgendamentoService;
 import br.com.fiap.clyvovet.service.ConsultaService;
@@ -39,6 +40,11 @@ public class TutorConsultaController {
         this.agendamentoService = agendamentoService;
         this.petService = petService;
         this.veterinarioService = veterinarioService;
+    }
+
+    @ModelAttribute("modalidades")
+    public Modalidade[] modalidades() {
+        return Modalidade.values();
     }
 
     @GetMapping

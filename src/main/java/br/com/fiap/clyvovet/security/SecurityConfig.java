@@ -24,6 +24,7 @@ public class SecurityConfig {
                         .requestMatchers("/cadastro/perfil/**").hasRole(UsuarioLogado.PAPEL_PENDENTE)
                         .requestMatchers("/tutor/**").hasRole("TUTOR")
                         .requestMatchers("/veterinario/**").hasRole("VETERINARIO")
+                        .requestMatchers("/conta/**").hasAnyRole("TUTOR", "VETERINARIO")
                         .anyRequest().authenticated())
                 .formLogin(login -> login
                         .loginPage(PAGINA_DE_LOGIN)

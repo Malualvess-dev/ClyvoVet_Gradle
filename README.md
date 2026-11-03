@@ -51,13 +51,16 @@ Por padrão a aplicação usa o perfil `dev` (H2 em memória). Ao iniciar, o Fly
 
 ## Contas de demonstração
 
-Criadas pela migration `V4__inserir_dados_de_demonstracao.sql`. **Senha de todas: `Clyvo@2026`**
+São os usuários do script do grupo de Banco de Dados (migration `V2__inserir_dados_do_grupo.sql`). **Senha de todas: `Clyvo@2026`**
 
 | Perfil | E-mail | O que já existe |
 |---|---|---|
-| Tutor | `carla@clyvovet.com` | Pets Thor e Mia; Thor com uma consulta concluída e duas vacinas |
-| Veterinário | `ana.vet@clyvovet.com` | Clínica geral |
-| Veterinário | `bruno.vet@clyvovet.com` | Dermatologia |
+| Tutor | `joao.tutor@clyvo.com` | Pet Thor, com consulta realizada, prontuário, duas vacinas e leituras da coleira |
+| Tutor | `lucas.tutor@clyvo.com` | Pet Mingau |
+| Veterinário | `vet.roberto@clyvo.com` | Dr. Roberto Santos, clínica geral |
+| Veterinário | `vet.camila@clyvo.com` | Dra. Camila Lima, dermatologia |
+
+Os demais usuários do script (`malu.tutor`, `ana.tutor`, `carlos.tutor`, `vet.fernando`, `vet.beatriz`, `vet.gabriel`, todos `@clyvo.com`) também entram com a mesma senha.
 
 Também é possível criar uma conta nova em **/cadastro** e escolher o perfil em seguida.
 
@@ -85,9 +88,9 @@ $env:GITHUB_CLIENT_SECRET="seu-client-secret"
 
 No primeiro acesso via Google/GitHub a conta é criada automaticamente e o usuário escolhe o perfil (tutor ou veterinário) antes de acessar o sistema.
 
-## Banco Oracle (opcional)
+## Banco Oracle
 
-Para usar Oracle, ative o perfil `oracle` e informe a conexão por variáveis de ambiente:
+A aplicação usa o **mesmo banco relacional da disciplina de Banco de Dados**: as 20 tabelas, as sequences, os dados iniciais, os packages e o trigger do grupo. Para usar Oracle, ative o perfil `oracle` e informe a conexão por variáveis de ambiente:
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE="oracle"
@@ -97,7 +100,35 @@ $env:DB_PASSWORD="sua_senha"
 ./gradlew bootRun
 ```
 
-As migrations usam SQL compatível com Oracle e com o H2 em modo Oracle, e as tabelas usam o prefixo `TB_CV_` para não conflitar com tabelas antigas.
+As migrations comuns (`db/migration`) usam SQL compatível com Oracle e com o H2 em modo Oracle. Os packages e o trigger (`db/oracle`) só rodam no Oracle.
+
+**Primeira execução num usuário Oracle que já tinha as tabelas:** rode uma vez o script [`infra/oracle/limpar-schema-clyvovet.sql`](infra/oracle/limpar-schema-clyvovet.sql) no SQL Developer (F5). Ele remove as tabelas antigas e o histórico do Flyway; ao subir, a aplicação recria tudo com os dados do grupo.
+
+### Integração com as procedures do grupo
+
+| Objeto do banco | Onde a aplicação usa |
+|---|---|
+| `PKG_PETS_JSON_API.PR_EXPORTAR_PETS_JSON` | Área do veterinário → **Banco de dados**: JSON de todos os pets |
+| `PKG_RELATORIOS_API.PR_RELATORIO_COLEIRA` | Área do veterinário → **Banco de dados**: relatório de batimentos por pet |
+| `PKG_RELATORIOS.FN_CALCULAR_IDADE_PET` | Prontuário do pet (idade exibida ao tutor) |
+| `TRG_AUDITORIA_COLEIRA` + `PKG_AUDITORIA_COLEIRA` | Ao gravar uma leitura da coleira pela tela **Banco de dados**, o trigger registra a operação em `TB_AUDITORIA_COLEIRA` |
+| `TB_LOG_ERRO` | Erros das procedures chamadas pela aplicação ficam registrados nesta tabela |
+
+### Como a aplicação usa cada tabela
+
+| Tabela | Uso na aplicação |
+|---|---|
+| `TB_USUARIO`, `TB_TUTOR`, `TB_VETERINARIO` | Login, perfis e cadastro |
+| `TB_PET`, `TB_RACA`, `TB_ESPECIE` | Cadastro de pets (raça escolhida por espécie) |
+| `TB_CONSULTA` | Fluxo de agendamento |
+| `TB_PRONTUARIO`, `TB_PRESCRICAO` | Fluxo de atendimento |
+| `TB_HISTORICO_SAUDE` | Vacinas, exames e reforços previstos |
+| `TB_NOTIFICACAO` | Avisos de cada etapa |
+| `TB_COLEIRA`, `TB_AUDITORIA_COLEIRA` | Leituras da coleira inteligente e auditoria |
+| `TB_AGENDA` | Lembretes pessoais (cadastro, alteração e exclusão) |
+| `TB_ANEXO` | Documentos do usuário |
+| `TB_ENDERECO`, `TB_BAIRRO`, `TB_CIDADE`, `TB_ESTADO` | Endereço do usuário |
+| `TB_LOG_ERRO` | Erros das procedures |
 
 ## Requisitos da entrega
 
@@ -112,10 +143,11 @@ As migrations usam SQL compatível com Oracle e com o H2 em modo Oracle, e as ta
 
 | Versão | Migration |
 |---|---|
-| V1 | `criar_tabelas_de_usuarios` — usuários, tutores, veterinários |
-| V2 | `criar_tabelas_de_pets_e_consultas` — pets, consultas, notificações |
-| V3 | `adicionar_prontuario_e_vacinas` — evolução de schema: novas colunas em consulta + tabela de vacinas |
-| V4 | `inserir_dados_de_demonstracao` — contas e dados de demonstração |
+| V1 | `criar_estrutura_do_banco` — as 20 tabelas, chaves e sequences do modelo do grupo |
+| V2 | `inserir_dados_do_grupo` — dados iniciais do script do grupo |
+| V3 | `ajustar_tabelas_para_a_aplicacao` — evolução de schema: nome e provedor do usuário, peso do pet, status SOLICITADA/RECUSADA, justificativa, reforço de vacina |
+| V4 | `complementar_dados_de_demonstracao` — raças comuns e reforços de vacina |
+| R__ (só Oracle) | packages `PKG_PETS_JSON(_API)`, `PKG_RELATORIOS(_API)`, `PKG_AUDITORIA_COLEIRA` e trigger `TRG_AUDITORIA_COLEIRA` |
 
 O Hibernate **não** altera o schema (`ddl-auto=none`): o Flyway é o único responsável pela estrutura do banco.
 
@@ -151,6 +183,8 @@ Tutor solicita ──► SOLICITADA ──► Veterinário confirma ──► CO
                        └─► Tutor cancela ──► CANCELADA
 ```
 
+No banco, a consulta confirmada fica com status `AGENDADA` e a concluída com `REALIZADA`, os mesmos valores do modelo do grupo (`StatusConsultaConverter`). O tutor escolhe a modalidade: presencial ou online.
+
 Regras (`PoliticaDeAgendamento`, `AgendamentoService` e `Consulta`):
 
 - Atendimento de segunda a sábado, das 08:00 às 17:30, em intervalos de 30 minutos.
@@ -165,9 +199,10 @@ Regras (`PoliticaDeAgendamento`, `AgendamentoService` e `Consulta`):
 
 ```
 CONFIRMADA ──► Veterinário registra o atendimento ──► CONCLUIDA
-                  ├─ diagnóstico, prescrição e peso aferido
+                  ├─ TB_PRONTUARIO: sintomas, diagnóstico, tratamento, peso, temperatura, exames e retorno
+                  ├─ TB_PRESCRICAO: medicamento, dieta ou restrição (opcional)
                   ├─ atualiza o peso do pet
-                  ├─ registra a vacina aplicada e a próxima dose (opcional)
+                  ├─ TB_HISTORICO_SAUDE: vacina aplicada e próxima dose (opcional)
                   └─ notifica o tutor
 ```
 
@@ -185,17 +220,24 @@ src/main/java/br/com/fiap/clyvovet
 ├── config          # Relógio da aplicação (fuso America/Sao_Paulo)
 ├── controller      # Controllers MVC
 │   ├── tutor/        # PetController, TutorConsultaController, TutorPainelController
-│   ├── veterinario/  # VeterinarioAgendaController, AtendimentoController
+│   ├── veterinario/  # VeterinarioAgendaController, AtendimentoController, BancoDeDadosController
+│   ├── conta/        # Lembretes (TB_AGENDA), documentos (TB_ANEXO) e endereço (TB_ENDERECO)
 │   └── advice/       # Dados globais das telas e tratamento de erros
 ├── dto
 │   ├── request     # Dados recebidos dos formulários, com Bean Validation (*Request)
 │   └── response    # Dados enviados às telas (*Response, records imutáveis)
 ├── exception       # RegraNegocioException, RecursoNaoEncontradoException
 ├── mapper          # Conversão entidade → Response
-├── model           # Entidades JPA com as regras de transição de status
+├── model           # Entidades JPA das tabelas do grupo, com as regras de negócio
+│   └── conversor/    # Status da consulta e coluna S/N
 ├── repository      # Spring Data JPA
 ├── security        # SecurityConfig, OAuth2, usuário logado e sessão
 └── service         # Casos de uso (agendamento, atendimento, contas...)
+    └── banco/        # Chamada das procedures do Oracle (com versão vazia para o H2)
+
+src/main/resources/db
+├── migration       # Flyway: estrutura e dados (H2 e Oracle)
+└── oracle          # Flyway: packages e trigger do grupo (só Oracle)
 ```
 
 Fluxo de uma requisição: **Controller** recebe o `*Request` validado → **Service** aplica as regras sobre as entidades (`model`) → **Mapper** converte para `*Response` → **Controller** entrega o response ao template Thymeleaf. As telas nunca recebem entidades JPA.
@@ -213,8 +255,9 @@ Decisões de projeto:
 ./gradlew test
 ```
 
-41 testes:
+75 testes:
 
-- `ConsultaTest` e `PoliticaDeAgendamentoTest` — regras de domínio (transições, 24h, horários, domingo).
-- `FluxosDeNegocioTest` — os dois fluxos completos sobre o banco criado pelo Flyway.
-- `PaginasESegurancaTest` — todas as páginas carregam, cada perfil é bloqueado na área do outro (403), visitantes são redirecionados ao login, CSRF e validações dos formulários.
+- `ConsultaTest`, `RegrasDoModeloTest` e `PoliticaDeAgendamentoTest` — regras de domínio (transições, 24h, horários, domingo, retorno, vacinas, alerta da coleira, conversão dos status para o modelo do grupo).
+- `FluxosDeNegocioTest` — os dois fluxos completos sobre o banco do grupo criado pelo Flyway, conferindo os valores gravados nas tabelas.
+- `MinhaContaTest` — cadastro, alteração e exclusão de lembretes, documentos, endereço e leituras da coleira.
+- `PaginasESegurancaTest` — todas as páginas carregam, cada perfil é bloqueado na área do outro (403), dados de outro usuário não são encontrados (404), CSRF e validações dos formulários.

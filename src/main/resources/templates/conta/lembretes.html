@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Lembretes')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('lembretes')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <h1>Lembretes</h1>
+                <p>Sua agenda pessoal: retornos, medicações, banhos terapêuticos e compromissos da clínica.</p>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <div class="grade-2">
+            <section class="cartao">
+                <h2>Próximos lembretes</h2>
+                <p class="vazio" th:if="${lembretes.isEmpty()}">Nenhum lembrete cadastrado.</p>
+                <ul class="lista">
+                    <li class="item" th:each="item : ${lembretes}">
+                        <div>
+                            <div class="item-titulo" th:text="${item.titulo}">Título</div>
+                            <div class="item-detalhe" th:text="${#temporals.format(item.dataHora, 'dd/MM/yyyy HH:mm')}">Data</div>
+                            <div class="item-detalhe" th:if="${item.anotacao}" th:text="${item.anotacao}">Anotação</div>
+                        </div>
+                        <div class="item-acoes">
+                            <a class="botao botao-secundario botao-pequeno" th:href="@{/conta/lembretes/{id}/edicao(id=${item.id})}">Editar</a>
+                            <details>
+                                <summary class="botao botao-perigo botao-pequeno">Excluir</summary>
+                                <form class="acao-inline" th:action="@{/conta/lembretes/{id}/exclusao(id=${item.id})}" method="post">
+                                    <span class="item-detalhe">Excluir este lembrete?</span>
+                                    <button type="submit" class="botao botao-perigo botao-pequeno">Confirmar</button>
+                                </form>
+                            </details>
+                        </div>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="cartao">
+                <h2>Novo lembrete</h2>
+                <form class="formulario" th:action="@{/conta/lembretes}" th:object="${lembrete}" method="post" novalidate>
+                    <div th:replace="~{conta/lembrete-edicao :: campos}"></div>
+                    <button type="submit" class="botao">Salvar lembrete</button>
+                </form>
+            </section>
+        </div>
+    </main>
+</div>
+</body>
+</html>

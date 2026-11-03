@@ -11,4 +11,6 @@ public interface PetRepository extends JpaRepository<Pet, Long> {
     List<Pet> findByTutor_Usuario_IdOrderByNomeAsc(Long usuarioId);
 
     Optional<Pet> findByIdAndTutor_Usuario_Id(Long petId, Long usuarioId);
+
+    List<Pet> findAllByOrderByNomeAsc();
 }

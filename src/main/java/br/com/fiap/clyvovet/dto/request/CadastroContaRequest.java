@@ -16,7 +16,7 @@ public class CadastroContaRequest {
 
     @NotBlank(message = "Informe seu e-mail.")
     @Email(message = "Informe um e-mail válido.")
-    @Size(max = 120, message = "O e-mail deve ter no máximo 120 caracteres.")
+    @Size(max = 80, message = "O e-mail deve ter no máximo 80 caracteres.")
     private String email;
 
     @NotBlank(message = "Informe uma senha.")

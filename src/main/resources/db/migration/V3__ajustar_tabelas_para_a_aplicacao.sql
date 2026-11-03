@@ -1,0 +1,45 @@
+-- =============================================================================
+-- Evolução do modelo do grupo para atender os fluxos da aplicação Java.
+-- Só acrescenta: colunas novas são opcionais (ou têm valor padrão) e a regra de
+-- status da consulta passa a aceitar dois valores a mais. O backend C# continua
+-- funcionando sem alteração.
+-- =============================================================================
+
+-- Usuário: nome para exibição e provedor de login (LOCAL, GOOGLE ou GITHUB).
+ALTER TABLE TB_USUARIO ADD NOME VARCHAR2(100 CHAR);
+ALTER TABLE TB_USUARIO ADD PROVEDOR VARCHAR2(20 CHAR) DEFAULT 'LOCAL' NOT NULL;
+ALTER TABLE TB_USUARIO ADD CONSTRAINT CK_USUARIO_PROVEDOR CHECK (PROVEDOR IN ('LOCAL', 'GOOGLE', 'GITHUB'));
+
+UPDATE TB_USUARIO u
+   SET NOME = (SELECT t.NOME_TUTOR FROM TB_TUTOR t WHERE t.ID_USUARIO = u.ID_USUARIO)
+ WHERE EXISTS (SELECT 1 FROM TB_TUTOR t WHERE t.ID_USUARIO = u.ID_USUARIO);
+
+UPDATE TB_USUARIO u
+   SET NOME = (SELECT v.NOME FROM TB_VETERINARIO v WHERE v.ID_USUARIO = u.ID_USUARIO)
+ WHERE EXISTS (SELECT 1 FROM TB_VETERINARIO v WHERE v.ID_USUARIO = u.ID_USUARIO);
+
+-- Pet: peso atual, atualizado a cada atendimento.
+ALTER TABLE TB_PET ADD PESO_KG NUMBER(5, 2);
+
+UPDATE TB_PET p
+   SET PESO_KG = (SELECT MAX(pr.PESO_ANIMAL)
+                    FROM TB_PRONTUARIO pr
+                    JOIN TB_CONSULTA c ON c.ID_CONSULTA = pr.ID_CONSULTA
+                   WHERE c.ID_PET = p.ID_PET);
+
+-- Consulta: fluxo de agendamento com solicitação, confirmação e recusa.
+--   SOLICITADA -> AGENDADA (confirmada) -> REALIZADA
+--   SOLICITADA -> RECUSADA        SOLICITADA/AGENDADA -> CANCELADA
+ALTER TABLE TB_CONSULTA ADD JUSTIFICATIVA VARCHAR2(250 CHAR);
+ALTER TABLE TB_CONSULTA ADD DATA_SOLICITACAO TIMESTAMP;
+ALTER TABLE TB_CONSULTA DROP CONSTRAINT CK_CONSULTA_STATUS;
+ALTER TABLE TB_CONSULTA ADD CONSTRAINT CK_CONSULTA_STATUS
+    CHECK (STATUS IN ('SOLICITADA', 'AGENDADA', 'RECUSADA', 'CANCELADA', 'REALIZADA'));
+
+CREATE INDEX IX_CONSULTA_VETERINARIO_DATA ON TB_CONSULTA (ID_VETERINARIO, DATA_HORA);
+
+-- Histórico de saúde: data do reforço (vacinas) e consulta em que o evento ocorreu.
+ALTER TABLE TB_HISTORICO_SAUDE ADD PROXIMA_DOSE DATE;
+ALTER TABLE TB_HISTORICO_SAUDE ADD ID_CONSULTA NUMBER(6);
+ALTER TABLE TB_HISTORICO_SAUDE ADD CONSTRAINT FK_HISTORICO_SAUDE_CONSULTA
+    FOREIGN KEY (ID_CONSULTA) REFERENCES TB_CONSULTA (ID_CONSULTA);

@@ -10,34 +10,52 @@
             <div class="item-titulo"
                  th:text="${#temporals.format(atendimento.dataHora, 'dd/MM/yyyy')} + ' · ' + ${atendimento.motivo}">Atendimento</div>
             <div class="item-detalhe"
-                 th:text="${atendimento.veterinarioNome} + ' · Peso aferido: ' + ${atendimento.pesoAferidoKg} + ' kg'">Veterinário</div>
-            <div class="prontuario">
-                <p><strong>Diagnóstico:</strong> <span th:text="${atendimento.diagnostico}">Diagnóstico</span></p>
-                <p th:if="${atendimento.prescricao}"><strong>Prescrição:</strong> <span th:text="${atendimento.prescricao}">Prescrição</span></p>
+                 th:text="${atendimento.veterinarioNome} + ' · ' + ${atendimento.modalidade.descricao}">Veterinário</div>
+            <div class="prontuario" th:if="${atendimento.prontuario}" th:with="prontuario=${atendimento.prontuario}">
+                <p><strong>Diagnóstico:</strong> <span th:text="${prontuario.diagnostico}">Diagnóstico</span></p>
+                <p th:if="${prontuario.sintomas}"><strong>Sintomas:</strong> <span th:text="${prontuario.sintomas}">Sintomas</span></p>
+                <p th:if="${prontuario.tratamento}"><strong>Tratamento:</strong> <span th:text="${prontuario.tratamento}">Tratamento</span></p>
+                <p th:if="${prontuario.pesoKg} or ${prontuario.temperatura}">
+                    <strong>Sinais:</strong>
+                    <span th:if="${prontuario.pesoKg}" th:text="${prontuario.pesoKg} + ' kg'">Peso</span>
+                    <span th:if="${prontuario.pesoKg} and ${prontuario.temperatura}"> · </span>
+                    <span th:if="${prontuario.temperatura}" th:text="${prontuario.temperatura} + ' °C'">Temperatura</span>
+                </p>
+                <p th:if="${prontuario.examesSolicitados}"><strong>Exames:</strong> <span th:text="${prontuario.examesSolicitados}">Exames</span></p>
+                <p th:each="prescricao : ${prontuario.prescricoes}">
+                    <strong th:text="${prescricao.tipo.descricao} + ':'">Prescrição:</strong>
+                    <span th:text="${prescricao.descricao} + (${prescricao.posologia} ? ' — ' + ${prescricao.posologia} : '')">Prescrição</span>
+                </p>
+                <p th:if="${prontuario.dataRetorno}"><strong>Retorno:</strong> <span th:text="${#temporals.format(prontuario.dataRetorno, 'dd/MM/yyyy')}">Data</span></p>
             </div>
         </li>
     </ul>
 </section>
 
-<section th:fragment="carteira-de-vacinacao" class="cartao">
-    <h2>Carteira de vacinação</h2>
-    <p class="vazio" th:if="${vacinas.isEmpty()}">Nenhuma vacina registrada.</p>
-    <table class="tabela" th:unless="${vacinas.isEmpty()}">
-        <thead>
-        <tr>
-            <th>Vacina</th>
-            <th>Aplicação</th>
-            <th>Próxima dose</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="vacina : ${vacinas}">
-            <td th:text="${vacina.nome}">Vacina</td>
-            <td th:text="${#temporals.format(vacina.dataAplicacao, 'dd/MM/yyyy')}">Data</td>
-            <td th:text="${vacina.proximaDose} ? ${#temporals.format(vacina.proximaDose, 'dd/MM/yyyy')} : '—'">Data</td>
-        </tr>
-        </tbody>
-    </table>
+<section th:fragment="historico-de-saude" class="cartao">
+    <h2>Histórico de saúde e vacinas</h2>
+    <p class="vazio" th:if="${historicoSaude.isEmpty()}">Nenhum evento de saúde registrado.</p>
+    <div class="tabela-rolagem" th:unless="${historicoSaude.isEmpty()}">
+        <table class="tabela">
+            <thead>
+            <tr>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Próxima dose</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="evento : ${historicoSaude}">
+                <td>
+                    <strong th:text="${evento.evento}">Evento</strong>
+                    <div class="item-detalhe" th:if="${evento.detalhes}" th:text="${evento.detalhes}">Detalhes</div>
+                </td>
+                <td th:text="${#temporals.format(evento.dataEvento, 'dd/MM/yyyy')}">Data</td>
+                <td th:text="${evento.proximaDose} ? ${#temporals.format(evento.proximaDose, 'dd/MM/yyyy')} : '—'">Data</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </section>
 
 </body>

@@ -9,50 +9,58 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "TB_CV_PET")
+@Table(name = "TB_PET")
 public class Pet {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_PET")
+    @SequenceGenerator(name = "SEQ_PET", sequenceName = "SEQ_PET", allocationSize = 1)
     @Column(name = "ID_PET")
     private Long id;
+
+    @Column(name = "NOME", nullable = false, length = 50)
+    private String nome;
+
+    @Column(name = "DT_NASCIMENTO", nullable = false)
+    private LocalDate dataNascimento;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "SEXO", nullable = false, length = 1)
+    private Sexo sexo;
+
+    @Column(name = "FOTO_URL", length = 255)
+    private String fotoUrl;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "ID_TUTOR", nullable = false)
     private Tutor tutor;
 
-    @Column(name = "NOME", nullable = false, length = 60)
-    private String nome;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ID_RACA", nullable = false)
+    private Raca raca;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "ESPECIE", nullable = false, length = 20)
-    private Especie especie;
-
-    @Column(name = "RACA", length = 60)
-    private String raca;
-
-    @Column(name = "DT_NASCIMENTO", nullable = false)
-    private LocalDate dataNascimento;
-
-    @Column(name = "PESO_KG", nullable = false, precision = 5, scale = 2)
+    @Column(name = "PESO_KG", precision = 5, scale = 2)
     private BigDecimal pesoKg;
 
     protected Pet() {
     }
 
-    public Pet(Tutor tutor, String nome, Especie especie, String raca, LocalDate dataNascimento, BigDecimal pesoKg) {
+    public Pet(Tutor tutor, String nome, Raca raca, Sexo sexo, LocalDate dataNascimento, BigDecimal pesoKg,
+               String fotoUrl) {
         this.tutor = tutor;
         this.nome = nome.strip();
-        this.especie = especie;
         this.raca = raca;
+        this.sexo = sexo;
         this.dataNascimento = dataNascimento;
         this.pesoKg = pesoKg;
+        this.fotoUrl = Texto.opcional(fotoUrl);
     }
 
     public void atualizarPeso(BigDecimal pesoAferidoKg) {
@@ -63,24 +71,32 @@ public class Pet {
         return id;
     }
 
-    public Tutor getTutor() {
-        return tutor;
-    }
-
     public String getNome() {
         return nome;
     }
 
-    public Especie getEspecie() {
-        return especie;
+    public LocalDate getDataNascimento() {
+        return dataNascimento;
     }
 
-    public String getRaca() {
+    public Sexo getSexo() {
+        return sexo;
+    }
+
+    public String getFotoUrl() {
+        return fotoUrl;
+    }
+
+    public Tutor getTutor() {
+        return tutor;
+    }
+
+    public Raca getRaca() {
         return raca;
     }
 
-    public LocalDate getDataNascimento() {
-        return dataNascimento;
+    public Especie getEspecie() {
+        return raca.getEspecie();
     }
 
     public BigDecimal getPesoKg() {

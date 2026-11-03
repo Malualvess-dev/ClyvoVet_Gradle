@@ -8,31 +8,33 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Entity
-@Table(name = "TB_CV_USUARIO")
+@Table(name = "TB_USUARIO")
 public class Usuario {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_USUARIO")
+    @SequenceGenerator(name = "SEQ_USUARIO", sequenceName = "SEQ_USUARIO", allocationSize = 1)
     @Column(name = "ID_USUARIO")
     private Long id;
 
-    @Column(name = "NOME", nullable = false, length = 100)
+    @Column(name = "NOME", length = 100)
     private String nome;
 
-    @Column(name = "EMAIL", nullable = false, length = 120, unique = true)
+    @Column(name = "EMAIL", nullable = false, length = 80, unique = true)
     private String email;
 
     @Column(name = "SENHA", length = 100)
     private String senha;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "PERFIL", length = 20)
+    @Column(name = "TIPO_USER", length = 35)
     private Perfil perfil;
 
     @Enumerated(EnumType.STRING)
@@ -84,8 +86,9 @@ public class Usuario {
         return id;
     }
 
+    /** Usuários criados fora da aplicação (pelo script do banco) podem não ter nome: usa o início do e-mail. */
     public String getNome() {
-        return nome;
+        return nome != null ? nome : email.substring(0, email.indexOf('@'));
     }
 
     public String getEmail() {

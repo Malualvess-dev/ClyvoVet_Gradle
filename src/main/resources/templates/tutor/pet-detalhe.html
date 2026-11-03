@@ -7,17 +7,42 @@
 
     <main class="conteudo">
         <header class="cabecalho">
-            <div>
-                <p><a th:href="@{/tutor/pets}">← Meus pets</a></p>
-                <h1 th:text="${pet.nome}">Pet</h1>
-                <p th:text="${pet.especie.descricao} + (${pet.raca} ? ' · ' + ${pet.raca} : '') + ' · nascido em ' + ${#temporals.format(pet.dataNascimento, 'dd/MM/yyyy')} + ' · ' + ${pet.pesoKg} + ' kg'">Detalhes</p>
+            <div class="pet-identificacao">
+                <img class="foto-pet" th:if="${pet.fotoUrl}" th:src="${pet.fotoUrl}" th:alt="'Foto de ' + ${pet.nome}">
+                <div>
+                    <p><a th:href="@{/tutor/pets}">← Meus pets</a></p>
+                    <h1 th:text="${pet.nome}">Pet</h1>
+                    <p th:text="${pet.especie} + ' · ' + ${pet.raca} + ' (porte ' + ${pet.porte.toLowerCase()} + ') · ' + ${pet.sexo.descricao}">Espécie</p>
+                    <p th:text="'Nascido em ' + ${#temporals.format(pet.dataNascimento, 'dd/MM/yyyy')} + ' · ' + ${idade} + (${idade == 1} ? ' ano' : ' anos') + (${pet.pesoKg} ? ' · ' + ${pet.pesoKg} + ' kg' : '')">Idade</p>
+                </div>
             </div>
             <a class="botao" th:href="@{/tutor/consultas/nova(petId=${pet.id})}">+ Agendar consulta</a>
         </header>
 
         <div class="grade-2">
             <section th:replace="~{fragments/historico :: historico-clinico}"></section>
-            <section th:replace="~{fragments/historico :: carteira-de-vacinacao}"></section>
+            <div>
+                <section th:replace="~{fragments/historico :: historico-de-saude}"></section>
+                <br>
+                <section class="cartao">
+                    <h2>Coleira inteligente</h2>
+                    <p class="vazio" th:if="${leituras.isEmpty()}">Nenhuma leitura recebida da coleira.</p>
+                    <ul class="lista">
+                        <li class="item" th:each="leitura : ${leituras}">
+                            <div>
+                                <div class="item-titulo" th:text="${leitura.batimentoBpm} + ' bpm'">Batimentos</div>
+                                <div class="item-detalhe" th:text="${#temporals.format(leitura.dataHora, 'dd/MM/yyyy HH:mm')}">Data</div>
+                            </div>
+                            <div class="item-acoes">
+                                <span class="selo" th:classappend="${leitura.alerta} ? 'selo-alerta' : 'selo-normal'"
+                                      th:text="${leitura.alerta} ? 'Alerta' : 'Normal'">Status</span>
+                                <a class="botao botao-secundario botao-pequeno" target="_blank" rel="noopener"
+                                   th:href="'https://www.google.com/maps?q=' + ${leitura.latitude} + ',' + ${leitura.longitude}">Ver no mapa</a>
+                            </div>
+                        </li>
+                    </ul>
+                </section>
+            </div>
         </div>
     </main>
 </div>

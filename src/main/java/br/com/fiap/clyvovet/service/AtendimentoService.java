@@ -2,8 +2,8 @@ package br.com.fiap.clyvovet.service;
 
 import br.com.fiap.clyvovet.dto.request.AtendimentoRequest;
 import br.com.fiap.clyvovet.model.Consulta;
-import br.com.fiap.clyvovet.model.Vacina;
-import br.com.fiap.clyvovet.repository.VacinaRepository;
+import br.com.fiap.clyvovet.model.HistoricoSaude;
+import br.com.fiap.clyvovet.repository.HistoricoSaudeRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,23 +15,25 @@ import java.time.LocalDateTime;
 public class AtendimentoService {
 
     private final ConsultaService consultaService;
-    private final VacinaRepository vacinaRepository;
+    private final HistoricoSaudeRepository historicoSaudeRepository;
     private final NotificacaoService notificacaoService;
     private final Clock relogio;
 
-    public AtendimentoService(ConsultaService consultaService, VacinaRepository vacinaRepository,
+    public AtendimentoService(ConsultaService consultaService, HistoricoSaudeRepository historicoSaudeRepository,
                               NotificacaoService notificacaoService, Clock relogio) {
         this.consultaService = consultaService;
-        this.vacinaRepository = vacinaRepository;
+        this.historicoSaudeRepository = historicoSaudeRepository;
         this.notificacaoService = notificacaoService;
         this.relogio = relogio;
     }
 
     public void registrar(Long usuarioVeterinarioId, Long consultaId, AtendimentoRequest request) {
         Consulta consulta = consultaService.buscarDoVeterinario(usuarioVeterinarioId, consultaId);
-        consulta.concluir(request.prontuario(), LocalDateTime.now(relogio));
+        LocalDateTime agora = LocalDateTime.now(relogio);
+        consulta.concluir(request.dadosDoAtendimento(), agora);
         if (request.aplicouVacina()) {
-            vacinaRepository.save(Vacina.aplicadaEm(consulta, request.getVacina(), request.getProximaDose()));
+            historicoSaudeRepository.save(HistoricoSaude.vacinaAplicada(
+                    consulta, request.getVacina(), agora.toLocalDate(), request.getProximaDose()));
         }
         notificacaoService.notificar(consulta.getPet().getTutor().getUsuario(),
                 "O atendimento de %s foi concluído. O prontuário já está disponível."

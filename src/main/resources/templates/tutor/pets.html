@@ -24,7 +24,7 @@
                         <div>
                             <div class="item-titulo" th:text="${item.nome}">Nome</div>
                             <div class="item-detalhe"
-                                 th:text="${item.especie.descricao} + (${item.raca} ? ' · ' + ${item.raca} : '') + ' · ' + ${item.pesoKg} + ' kg'">Detalhes</div>
+                                 th:text="${item.especie} + ' · ' + ${item.raca} + ' · ' + ${item.sexo.descricao} + (${item.pesoKg} ? ' · ' + ${item.pesoKg} + ' kg' : '')">Detalhes</div>
                         </div>
                         <a class="botao botao-secundario botao-pequeno" th:href="@{/tutor/pets/{id}(id=${item.id})}">Prontuário</a>
                     </li>
@@ -36,23 +36,38 @@
                 <form class="formulario" th:action="@{/tutor/pets}" th:object="${pet}" method="post" novalidate>
                     <div th:replace="~{fragments/layout :: campo('nome', 'Nome', 'text')}"></div>
                     <div class="linha">
-                        <div class="campo" th:classappend="${#fields.hasErrors('especie')} ? 'invalido'">
-                            <label for="especie">Espécie</label>
-                            <select th:field="*{especie}">
+                        <div class="campo" th:classappend="${#fields.hasErrors('racaId')} ? 'invalido'">
+                            <label for="racaId">Espécie e raça</label>
+                            <select th:field="*{racaId}">
                                 <option value="">Selecione</option>
-                                <option th:each="especie : ${especies}" th:value="${especie}" th:text="${especie.descricao}">Espécie</option>
+                                <optgroup th:each="grupo : ${racasPorEspecie}" th:label="${grupo.key}">
+                                    <option th:each="raca : ${grupo.value}" th:value="${raca.id}"
+                                            th:text="${raca.nome} + ' (porte ' + ${raca.porte.toLowerCase()} + ')'">Raça</option>
+                                </optgroup>
                             </select>
-                            <span th:replace="~{fragments/layout :: erro('especie')}"></span>
+                            <span th:replace="~{fragments/layout :: erro('racaId')}"></span>
                         </div>
-                        <div th:replace="~{fragments/layout :: campo('raca', 'Raça (opcional)', 'text')}"></div>
+                        <div class="campo" th:classappend="${#fields.hasErrors('sexo')} ? 'invalido'">
+                            <label for="sexo">Sexo</label>
+                            <select th:field="*{sexo}">
+                                <option value="">Selecione</option>
+                                <option th:each="sexo : ${sexos}" th:value="${sexo}" th:text="${sexo.descricao}">Sexo</option>
+                            </select>
+                            <span th:replace="~{fragments/layout :: erro('sexo')}"></span>
+                        </div>
                     </div>
                     <div class="linha">
                         <div th:replace="~{fragments/layout :: campo('dataNascimento', 'Data de nascimento', 'date')}"></div>
                         <div class="campo" th:classappend="${#fields.hasErrors('pesoKg')} ? 'invalido'">
                             <label for="pesoKg">Peso (kg)</label>
-                            <input type="number" step="0.01" min="0.1" th:field="*{pesoKg}">
+                            <input type="number" step="0.01" min="0.01" th:field="*{pesoKg}">
                             <span th:replace="~{fragments/layout :: erro('pesoKg')}"></span>
                         </div>
+                    </div>
+                    <div class="campo" th:classappend="${#fields.hasErrors('fotoUrl')} ? 'invalido'">
+                        <label for="fotoUrl">Link da foto (opcional)</label>
+                        <input type="url" th:field="*{fotoUrl}" placeholder="https://...">
+                        <span th:replace="~{fragments/layout :: erro('fotoUrl')}"></span>
                     </div>
                     <button type="submit" class="botao">Cadastrar pet</button>
                 </form>

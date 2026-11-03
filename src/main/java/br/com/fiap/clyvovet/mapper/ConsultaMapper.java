@@ -1,7 +1,11 @@
 package br.com.fiap.clyvovet.mapper;
 
 import br.com.fiap.clyvovet.dto.response.ConsultaResponse;
+import br.com.fiap.clyvovet.dto.response.PrescricaoResponse;
+import br.com.fiap.clyvovet.dto.response.ProntuarioResponse;
 import br.com.fiap.clyvovet.model.Consulta;
+import br.com.fiap.clyvovet.model.Prescricao;
+import br.com.fiap.clyvovet.model.Prontuario;
 import br.com.fiap.clyvovet.model.Tutor;
 import org.springframework.stereotype.Component;
 
@@ -24,17 +28,33 @@ public class ConsultaMapper {
         return new ConsultaResponse(
                 consulta.getId(),
                 consulta.getDataHora(),
+                consulta.getModalidade(),
                 consulta.getMotivo(),
                 consulta.getStatus(),
                 consulta.getJustificativa(),
-                consulta.getDiagnostico(),
-                consulta.getPrescricao(),
-                consulta.getPesoAferidoKg(),
+                consulta.getProntuario() == null ? null : prontuarioResponse(consulta.getProntuario()),
                 petMapper.paraResponse(consulta.getPet()),
                 tutor.getNome(),
                 tutor.getTelefone(),
                 consulta.getVeterinario().getNome(),
                 consulta.podeSerCancelada(LocalDateTime.now(relogio))
         );
+    }
+
+    private static ProntuarioResponse prontuarioResponse(Prontuario prontuario) {
+        return new ProntuarioResponse(
+                prontuario.getDiagnostico(),
+                prontuario.getSintomas(),
+                prontuario.getTratamento(),
+                prontuario.getPesoAnimal(),
+                prontuario.getTemperatura(),
+                prontuario.getExamesSolicitados(),
+                prontuario.getDataRetorno(),
+                prontuario.getPrescricoes().stream().map(ConsultaMapper::prescricaoResponse).toList()
+        );
+    }
+
+    private static PrescricaoResponse prescricaoResponse(Prescricao prescricao) {
+        return new PrescricaoResponse(prescricao.getTipo(), prescricao.getDescricao(), prescricao.getPosologia());
     }
 }

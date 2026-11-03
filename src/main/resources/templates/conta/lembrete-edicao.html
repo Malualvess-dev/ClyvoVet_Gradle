@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Editar lembrete')}"></head>
+<body>
+<div class="app">
+    <aside th:replace="~{fragments/layout :: menu('lembretes')}"></aside>
+
+    <main class="conteudo">
+        <header class="cabecalho">
+            <div>
+                <p><a th:href="@{/conta/lembretes}">← Lembretes</a></p>
+                <h1>Editar lembrete</h1>
+            </div>
+        </header>
+
+        <div th:replace="~{fragments/layout :: alertas}"></div>
+
+        <section class="cartao">
+            <form class="formulario" th:action="@{/conta/lembretes/{id}(id=${lembreteId})}" th:object="${lembrete}" method="post" novalidate>
+                <div th:fragment="campos">
+                    <div th:replace="~{fragments/layout :: campo('titulo', 'Título', 'text')}"></div>
+                    <div th:replace="~{fragments/layout :: campo('dataHora', 'Data e horário', 'datetime-local')}"></div>
+                    <div class="campo" th:classappend="${#fields.hasErrors('anotacao')} ? 'invalido'">
+                        <label for="anotacao">Anotação (opcional)</label>
+                        <textarea th:field="*{anotacao}" maxlength="2500"></textarea>
+                        <span th:replace="~{fragments/layout :: erro('anotacao')}"></span>
+                    </div>
+                </div>
+                <div>
+                    <button type="submit" class="botao">Salvar alterações</button>
+                </div>
+            </form>
+        </section>
+    </main>
+</div>
+</body>
+</html>

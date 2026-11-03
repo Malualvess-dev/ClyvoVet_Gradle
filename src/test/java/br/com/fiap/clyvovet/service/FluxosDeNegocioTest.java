@@ -5,17 +5,21 @@ import br.com.fiap.clyvovet.RelogioDeTesteConfig;
 import br.com.fiap.clyvovet.dto.request.AtendimentoRequest;
 import br.com.fiap.clyvovet.dto.request.SolicitacaoConsultaRequest;
 import br.com.fiap.clyvovet.dto.response.ConsultaResponse;
+import br.com.fiap.clyvovet.dto.response.HistoricoSaudeResponse;
 import br.com.fiap.clyvovet.dto.response.PetResponse;
-import br.com.fiap.clyvovet.dto.response.VacinaResponse;
 import br.com.fiap.clyvovet.dto.response.VeterinarioResponse;
 import br.com.fiap.clyvovet.exception.RegraNegocioException;
+import br.com.fiap.clyvovet.model.Modalidade;
 import br.com.fiap.clyvovet.model.StatusConsulta;
+import br.com.fiap.clyvovet.model.TipoPrescricao;
 import br.com.fiap.clyvovet.repository.UsuarioRepository;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -26,6 +30,7 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+/** Os dois fluxos completos sobre o banco do grupo, criado pelo Flyway (dados do scripts.sql). */
 @SpringBootTest
 @Import(RelogioDeTesteConfig.class)
 @Transactional
@@ -45,102 +50,143 @@ class FluxosDeNegocioTest {
     @Autowired
     private VeterinarioService veterinarioService;
     @Autowired
-    private VacinaService vacinaService;
+    private HistoricoSaudeService historicoSaudeService;
     @Autowired
     private NotificacaoService notificacaoService;
     @Autowired
     private UsuarioRepository usuarioRepository;
     @Autowired
     private RelogioAjustavel relogio;
+    @Autowired
+    private EntityManager entityManager;
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
-    private Long tutora;
-    private Long veterinaria;
+    private Long tutor;
+    private Long veterinario;
     private PetResponse thor;
-    private VeterinarioResponse draAna;
+    private VeterinarioResponse drRoberto;
 
     @BeforeEach
-    void prepararDadosDeDemonstracao() {
+    void prepararDadosDoGrupo() {
         relogio.ajustarPara(RelogioDeTesteConfig.SEGUNDA_AS_NOVE);
-        tutora = idDoUsuario("carla@clyvovet.com");
-        veterinaria = idDoUsuario("ana.vet@clyvovet.com");
-        thor = petService.listarDoTutor(tutora).stream()
+        tutor = idDoUsuario("joao.tutor@clyvo.com");
+        veterinario = idDoUsuario("vet.roberto@clyvo.com");
+        thor = petService.listarDoTutor(tutor).stream()
                 .filter(pet -> pet.nome().equals("Thor")).findFirst().orElseThrow();
-        draAna = veterinarioService.listar().stream()
-                .filter(veterinario -> veterinario.nome().equals("Dra. Ana Souza")).findFirst().orElseThrow();
+        drRoberto = veterinarioService.listar().stream()
+                .filter(vet -> vet.nome().equals("Dr. Roberto Santos")).findFirst().orElseThrow();
     }
 
     @Test
     void fluxoDeAgendamentoReservaHorarioENotificaOsEnvolvidos() {
-        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        long avisosDoVeterinario = notificacaoService.contarNaoLidas(veterinario);
+        long avisosDoTutor = notificacaoService.contarNaoLidas(tutor);
+
+        ConsultaResponse consulta = agendamentoService.solicitar(tutor, solicitacao(TERCA, DEZ_HORAS));
 
         assertThat(consulta.status()).isEqualTo(StatusConsulta.SOLICITADA);
-        assertThat(agendamentoService.horariosDisponiveis(draAna.id(), TERCA)).doesNotContain(DEZ_HORAS);
-        assertThat(notificacaoService.contarNaoLidas(veterinaria)).isEqualTo(1);
+        assertThat(consulta.modalidade()).isEqualTo(Modalidade.ONLINE);
+        assertThat(agendamentoService.horariosDisponiveis(drRoberto.id(), TERCA)).doesNotContain(DEZ_HORAS);
+        assertThat(notificacaoService.contarNaoLidas(veterinario)).isEqualTo(avisosDoVeterinario + 1);
 
-        agendamentoService.confirmar(veterinaria, consulta.id());
+        agendamentoService.confirmar(veterinario, consulta.id());
 
         assertThat(statusAtual(consulta)).isEqualTo(StatusConsulta.CONFIRMADA);
-        assertThat(notificacaoService.contarNaoLidas(tutora)).isEqualTo(1);
-        assertThat(consultaService.proximasDoTutor(tutora)).extracting(ConsultaResponse::id).contains(consulta.id());
+        assertThat(notificacaoService.contarNaoLidas(tutor)).isEqualTo(avisosDoTutor + 1);
+        assertThat(consultaService.proximasDoTutor(tutor)).extracting(ConsultaResponse::id).contains(consulta.id());
+    }
+
+    @Test
+    void consultaConfirmadaFicaComoAgendadaNoBancoDoGrupo() {
+        ConsultaResponse consulta = agendamentoService.solicitar(tutor, solicitacao(TERCA, DEZ_HORAS));
+        agendamentoService.confirmar(veterinario, consulta.id());
+        entityManager.flush();
+
+        String statusNoBanco = jdbcTemplate.queryForObject(
+                "SELECT STATUS FROM TB_CONSULTA WHERE ID_CONSULTA = ?", String.class, consulta.id());
+
+        assertThat(statusNoBanco).isEqualTo("AGENDADA");
     }
 
     @Test
     void petNaoPodeTerDuasConsultasAtivasNoMesmoDia() {
-        agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        agendamentoService.solicitar(tutor, solicitacao(TERCA, DEZ_HORAS));
 
-        assertThatThrownBy(() -> agendamentoService.solicitar(tutora, solicitacao(TERCA, LocalTime.of(15, 0))))
+        assertThatThrownBy(() -> agendamentoService.solicitar(tutor, solicitacao(TERCA, LocalTime.of(15, 0))))
                 .isInstanceOf(RegraNegocioException.class)
                 .hasMessageContaining("Thor");
     }
 
     @Test
     void cancelamentoDeConsultaConfirmadaRespeitaAntecedencia() {
-        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
-        agendamentoService.confirmar(veterinaria, consulta.id());
+        ConsultaResponse consulta = agendamentoService.solicitar(tutor, solicitacao(TERCA, DEZ_HORAS));
+        agendamentoService.confirmar(veterinario, consulta.id());
         relogio.ajustarPara(LocalDateTime.of(2026, 10, 19, 11, 0));
 
-        assertThatThrownBy(() -> agendamentoService.cancelar(tutora, consulta.id(), "Imprevisto no trabalho"))
+        assertThatThrownBy(() -> agendamentoService.cancelar(tutor, consulta.id(), "Imprevisto no trabalho"))
                 .isInstanceOf(RegraNegocioException.class);
     }
 
     @Test
     void veterinarioNaoAcessaConsultaDeOutroProfissional() {
-        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
-        Long outroVeterinario = idDoUsuario("bruno.vet@clyvovet.com");
+        ConsultaResponse consulta = agendamentoService.solicitar(tutor, solicitacao(TERCA, DEZ_HORAS));
+        Long outroVeterinario = idDoUsuario("vet.camila@clyvo.com");
 
         assertThatThrownBy(() -> agendamentoService.confirmar(outroVeterinario, consulta.id()))
                 .hasMessageContaining("não encontrada");
     }
 
     @Test
-    void fluxoDeAtendimentoConcluiProntuarioERegistraVacina() {
-        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
-        agendamentoService.confirmar(veterinaria, consulta.id());
+    void fluxoDeAtendimentoGeraProntuarioPrescricaoEVacina() {
+        ConsultaResponse consulta = agendamentoService.solicitar(tutor, solicitacao(TERCA, DEZ_HORAS));
+        agendamentoService.confirmar(veterinario, consulta.id());
         relogio.ajustarPara(LocalDateTime.of(TERCA, LocalTime.of(10, 40)));
 
-        atendimentoService.registrar(veterinaria, consulta.id(), atendimento("V8 (polivalente)", TERCA.plusDays(21)));
+        atendimentoService.registrar(veterinario, consulta.id(), atendimento("V8 (polivalente)", TERCA.plusDays(21)));
+        entityManager.flush();
 
         assertThat(statusAtual(consulta)).isEqualTo(StatusConsulta.CONCLUIDA);
-        assertThat(petService.detalharDoTutor(tutora, thor.id()).pesoKg()).isEqualByComparingTo("32.10");
-        assertThat(consultaService.historicoClinico(thor.id())).extracting(ConsultaResponse::id).contains(consulta.id());
-        assertThat(vacinaService.reforcosProximos(tutora)).extracting(VacinaResponse::nome).contains("V8 (polivalente)");
+        assertThat(petService.detalharDoTutor(tutor, thor.id()).pesoKg()).isEqualByComparingTo("32.10");
+        assertThat(consultaService.historicoClinico(thor.id()))
+                .filteredOn(atendida -> atendida.id().equals(consulta.id()))
+                .singleElement()
+                .satisfies(atendida -> {
+                    assertThat(atendida.prontuario().diagnostico()).isEqualTo("Animal saudável.");
+                    assertThat(atendida.prontuario().prescricoes()).hasSize(1);
+                });
+        assertThat(historicoSaudeService.reforcosProximos(tutor))
+                .extracting(HistoricoSaudeResponse::evento)
+                .contains("V8 (polivalente)");
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM TB_PRONTUARIO WHERE ID_CONSULTA = ?", Integer.class, consulta.id()))
+                .isEqualTo(1);
     }
 
     @Test
     void atendimentoExigeConsultaConfirmada() {
-        ConsultaResponse consulta = agendamentoService.solicitar(tutora, solicitacao(TERCA, DEZ_HORAS));
+        ConsultaResponse consulta = agendamentoService.solicitar(tutor, solicitacao(TERCA, DEZ_HORAS));
         relogio.ajustarPara(LocalDateTime.of(TERCA, LocalTime.of(10, 40)));
 
-        assertThatThrownBy(() -> atendimentoService.registrar(veterinaria, consulta.id(), atendimento(null, null)))
+        assertThatThrownBy(() -> atendimentoService.registrar(veterinario, consulta.id(), atendimento(null, null)))
                 .isInstanceOf(RegraNegocioException.class);
+    }
+
+    @Test
+    void historicoDoGrupoApareceParaOTutor() {
+        assertThat(consultaService.historicoClinico(thor.id())).isNotEmpty();
+        assertThat(historicoSaudeService.doPet(thor.id()))
+                .extracting(HistoricoSaudeResponse::evento)
+                .contains("Vacina Múltipla V10", "Vacina Antirrábica");
     }
 
     private SolicitacaoConsultaRequest solicitacao(LocalDate data, LocalTime horario) {
         SolicitacaoConsultaRequest request = new SolicitacaoConsultaRequest();
         request.setPetId(thor.id());
-        request.setVeterinarioId(draAna.id());
+        request.setVeterinarioId(drRoberto.id());
         request.setData(data);
         request.setHorario(horario);
+        request.setModalidade(Modalidade.ONLINE);
         request.setMotivo("Vacinação e check-up");
         return request;
     }
@@ -149,13 +195,17 @@ class FluxosDeNegocioTest {
         AtendimentoRequest request = new AtendimentoRequest();
         request.setDiagnostico("Animal saudável.");
         request.setPesoAferidoKg(new BigDecimal("32.10"));
+        request.setTemperatura(new BigDecimal("38.6"));
+        request.setTipoPrescricao(TipoPrescricao.MEDICAMENTO);
+        request.setPrescricao("Vermífugo amplo espectro");
+        request.setPosologia("Dose única");
         request.setVacina(vacina);
         request.setProximaDose(proximaDose);
         return request;
     }
 
     private StatusConsulta statusAtual(ConsultaResponse consulta) {
-        return consultaService.detalharDoVeterinario(veterinaria, consulta.id()).status();
+        return consultaService.detalharDoVeterinario(veterinario, consulta.id()).status();
     }
 
     private Long idDoUsuario(String email) {

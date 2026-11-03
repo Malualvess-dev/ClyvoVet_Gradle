@@ -1,6 +1,8 @@
 package br.com.fiap.clyvovet.dto.request;
 
-import br.com.fiap.clyvovet.model.Prontuario;
+import br.com.fiap.clyvovet.model.DadosDoAtendimento;
+import br.com.fiap.clyvovet.model.DadosDoAtendimento.DadosDaPrescricao;
+import br.com.fiap.clyvovet.model.TipoPrescricao;
 import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,19 +18,41 @@ import java.time.LocalDate;
 public class AtendimentoRequest {
 
     @NotBlank(message = "Descreva o diagnóstico.")
-    @Size(max = 1000, message = "O diagnóstico deve ter no máximo 1000 caracteres.")
+    @Size(max = 500, message = "O diagnóstico deve ter no máximo 500 caracteres.")
     private String diagnostico;
 
-    @Size(max = 1000, message = "A prescrição deve ter no máximo 1000 caracteres.")
-    private String prescricao;
+    @Size(max = 250, message = "Os sintomas devem ter no máximo 250 caracteres.")
+    private String sintomas;
+
+    @Size(max = 500, message = "O tratamento deve ter no máximo 500 caracteres.")
+    private String tratamento;
 
     @NotNull(message = "Informe o peso aferido.")
-    @DecimalMin(value = "0.1", message = "O peso deve ser de pelo menos 0,1 kg.")
+    @DecimalMin(value = "0.01", message = "O peso deve ser de pelo menos 0,01 kg.")
     @DecimalMax(value = "150.0", message = "O peso deve ser de no máximo 150 kg.")
     @Digits(integer = 3, fraction = 2, message = "Use no máximo duas casas decimais.")
     private BigDecimal pesoAferidoKg;
 
-    @Size(max = 80, message = "O nome da vacina deve ter no máximo 80 caracteres.")
+    @DecimalMin(value = "30.0", message = "A temperatura deve ser de pelo menos 30 °C.")
+    @DecimalMax(value = "45.0", message = "A temperatura deve ser de no máximo 45 °C.")
+    @Digits(integer = 2, fraction = 1, message = "Use no máximo uma casa decimal.")
+    private BigDecimal temperatura;
+
+    @Size(max = 250, message = "Os exames devem ter no máximo 250 caracteres.")
+    private String examesSolicitados;
+
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+    private LocalDate dataRetorno;
+
+    private TipoPrescricao tipoPrescricao;
+
+    @Size(max = 200, message = "A prescrição deve ter no máximo 200 caracteres.")
+    private String prescricao;
+
+    @Size(max = 350, message = "A posologia deve ter no máximo 350 caracteres.")
+    private String posologia;
+
+    @Size(max = 100, message = "O nome da vacina deve ter no máximo 100 caracteres.")
     private String vacina;
 
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
@@ -39,12 +63,25 @@ public class AtendimentoRequest {
         return proximaDose == null || aplicouVacina();
     }
 
+    @AssertTrue(message = "Escolha o tipo da prescrição.")
+    public boolean isPrescricaoComTipo() {
+        return !possuiPrescricao() || tipoPrescricao != null;
+    }
+
     public boolean aplicouVacina() {
         return vacina != null && !vacina.isBlank();
     }
 
-    public Prontuario prontuario() {
-        return new Prontuario(diagnostico, prescricao, pesoAferidoKg);
+    private boolean possuiPrescricao() {
+        return prescricao != null && !prescricao.isBlank();
+    }
+
+    public DadosDoAtendimento dadosDoAtendimento() {
+        DadosDaPrescricao dadosDaPrescricao = possuiPrescricao()
+                ? new DadosDaPrescricao(tipoPrescricao, prescricao, posologia)
+                : null;
+        return new DadosDoAtendimento(diagnostico, sintomas, tratamento, pesoAferidoKg, temperatura,
+                examesSolicitados, dataRetorno, dadosDaPrescricao);
     }
 
     public String getDiagnostico() {
@@ -55,12 +92,20 @@ public class AtendimentoRequest {
         this.diagnostico = diagnostico;
     }
 
-    public String getPrescricao() {
-        return prescricao;
+    public String getSintomas() {
+        return sintomas;
     }
 
-    public void setPrescricao(String prescricao) {
-        this.prescricao = prescricao;
+    public void setSintomas(String sintomas) {
+        this.sintomas = sintomas;
+    }
+
+    public String getTratamento() {
+        return tratamento;
+    }
+
+    public void setTratamento(String tratamento) {
+        this.tratamento = tratamento;
     }
 
     public BigDecimal getPesoAferidoKg() {
@@ -69,6 +114,54 @@ public class AtendimentoRequest {
 
     public void setPesoAferidoKg(BigDecimal pesoAferidoKg) {
         this.pesoAferidoKg = pesoAferidoKg;
+    }
+
+    public BigDecimal getTemperatura() {
+        return temperatura;
+    }
+
+    public void setTemperatura(BigDecimal temperatura) {
+        this.temperatura = temperatura;
+    }
+
+    public String getExamesSolicitados() {
+        return examesSolicitados;
+    }
+
+    public void setExamesSolicitados(String examesSolicitados) {
+        this.examesSolicitados = examesSolicitados;
+    }
+
+    public LocalDate getDataRetorno() {
+        return dataRetorno;
+    }
+
+    public void setDataRetorno(LocalDate dataRetorno) {
+        this.dataRetorno = dataRetorno;
+    }
+
+    public TipoPrescricao getTipoPrescricao() {
+        return tipoPrescricao;
+    }
+
+    public void setTipoPrescricao(TipoPrescricao tipoPrescricao) {
+        this.tipoPrescricao = tipoPrescricao;
+    }
+
+    public String getPrescricao() {
+        return prescricao;
+    }
+
+    public void setPrescricao(String prescricao) {
+        this.prescricao = prescricao;
+    }
+
+    public String getPosologia() {
+        return posologia;
+    }
+
+    public void setPosologia(String posologia) {
+        this.posologia = posologia;
     }
 
     public String getVacina() {

@@ -17,6 +17,8 @@ import java.util.List;
 @Transactional
 public class NotificacaoService {
 
+    private static final boolean NAO_LIDA = false;
+
     private final NotificacaoRepository notificacaoRepository;
     private final NotificacaoMapper notificacaoMapper;
     private final Clock relogio;
@@ -41,18 +43,16 @@ public class NotificacaoService {
 
     @Transactional(readOnly = true)
     public long contarNaoLidas(Long usuarioId) {
-        return notificacaoRepository.countByUsuario_IdAndDataLeituraIsNull(usuarioId);
+        return notificacaoRepository.countByUsuario_IdAndLida(usuarioId, NAO_LIDA);
     }
 
     public void marcarComoLida(Long usuarioId, Long notificacaoId) {
         notificacaoRepository.findByIdAndUsuario_Id(notificacaoId, usuarioId)
                 .orElseThrow(() -> new RecursoNaoEncontradoException("Notificação não encontrada."))
-                .marcarComoLida(LocalDateTime.now(relogio));
+                .marcarComoLida();
     }
 
     public void marcarTodasComoLidas(Long usuarioId) {
-        LocalDateTime agora = LocalDateTime.now(relogio);
-        notificacaoRepository.findByUsuario_IdAndDataLeituraIsNull(usuarioId)
-                .forEach(notificacao -> notificacao.marcarComoLida(agora));
+        notificacaoRepository.findByUsuario_IdAndLida(usuarioId, NAO_LIDA).forEach(Notificacao::marcarComoLida);
     }
 }
