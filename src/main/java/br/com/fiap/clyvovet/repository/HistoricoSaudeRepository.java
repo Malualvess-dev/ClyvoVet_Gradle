@@ -12,4 +12,6 @@ public interface HistoricoSaudeRepository extends JpaRepository<HistoricoSaude, 
 
     List<HistoricoSaude> findByPet_Tutor_Usuario_IdAndProximaDoseBetweenOrderByProximaDoseAsc(
             Long usuarioId, LocalDate inicio, LocalDate fim);
+
+    boolean existsByPet_Id(Long petId);
 }

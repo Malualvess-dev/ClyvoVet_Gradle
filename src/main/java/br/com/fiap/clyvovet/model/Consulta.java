@@ -106,6 +106,37 @@ public class Consulta {
         status = StatusConsulta.CANCELADA;
     }
 
+    /** Remarcação pelo tutor: a nova data volta a depender da confirmação do veterinário. */
+    public void remarcar(LocalDateTime novaDataHora, LocalDateTime agora) {
+        exigirStatus(StatusConsulta.SOLICITADA, StatusConsulta.CONFIRMADA);
+        if (status == StatusConsulta.CONFIRMADA && faltaMenosQue(ANTECEDENCIA_MINIMA_CANCELAMENTO, agora)) {
+            throw new RegraNegocioException(
+                    "Consultas confirmadas só podem ser remarcadas com no mínimo 24 horas de antecedência.");
+        }
+        if (novaDataHora.equals(dataHora)) {
+            throw new RegraNegocioException("Escolha uma data ou horário diferente do atual.");
+        }
+        dataHora = novaDataHora;
+        status = StatusConsulta.SOLICITADA;
+        justificativa = null;
+    }
+
+    /** O veterinário pode desmarcar uma consulta confirmada a qualquer momento antes do atendimento. */
+    public void cancelarPeloVeterinario(String motivoCancelamento) {
+        exigirStatus(StatusConsulta.CONFIRMADA);
+        justificativa = validarJustificativa(motivoCancelamento);
+        status = StatusConsulta.CANCELADA;
+    }
+
+    /** Só sai do banco o que não virou atendimento: consultas canceladas ou recusadas. */
+    public void garantirQuePodeSerExcluida() {
+        if (status != StatusConsulta.CANCELADA && status != StatusConsulta.RECUSADA) {
+            throw new RegraNegocioException(status == StatusConsulta.CONCLUIDA
+                    ? "Consultas realizadas fazem parte do prontuário do pet e não podem ser excluídas."
+                    : "Cancele a consulta antes de excluir o registro.");
+        }
+    }
+
     public void garantirQueAguardaAtendimento() {
         exigirStatus(StatusConsulta.CONFIRMADA);
     }

@@ -49,6 +49,9 @@ public class Pet {
     @Column(name = "PESO_KG", precision = 5, scale = 2)
     private BigDecimal pesoKg;
 
+    @Column(name = "OBSERVACOES", length = 500)
+    private String observacoes;
+
     protected Pet() {
     }
 
@@ -63,8 +66,24 @@ public class Pet {
         this.fotoUrl = Texto.opcional(fotoUrl);
     }
 
+    /** Peso aferido no atendimento. Se o veterinário não informar, mantém o peso atual. */
     public void atualizarPeso(BigDecimal pesoAferidoKg) {
-        this.pesoKg = pesoAferidoKg;
+        if (pesoAferidoKg != null) {
+            this.pesoKg = pesoAferidoKg;
+        }
+    }
+
+    public void atualizarDados(String novoNome, Raca novaRaca, Sexo novoSexo, LocalDate novaDataNascimento,
+                               BigDecimal novoPesoKg) {
+        this.nome = novoNome.strip();
+        this.raca = novaRaca;
+        this.sexo = novoSexo;
+        this.dataNascimento = novaDataNascimento;
+        this.pesoKg = novoPesoKg;
+    }
+
+    public void registrarObservacoes(String texto) {
+        this.observacoes = Texto.opcional(texto);
     }
 
     public Long getId() {
@@ -101,5 +120,9 @@ public class Pet {
 
     public BigDecimal getPesoKg() {
         return pesoKg;
+    }
+
+    public String getObservacoes() {
+        return observacoes;
     }
 }

@@ -8,4 +8,6 @@ import java.util.List;
 public interface LeituraColeiraRepository extends JpaRepository<LeituraColeira, Long> {
 
     List<LeituraColeira> findTop10ByPet_IdOrderByDataHoraDesc(Long petId);
+
+    boolean existsByPet_Id(Long petId);
 }

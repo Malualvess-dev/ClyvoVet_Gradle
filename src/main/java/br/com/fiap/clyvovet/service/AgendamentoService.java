@@ -71,7 +71,7 @@ public class AgendamentoService {
 
         politica.validar(dataHora);
         garantirHorarioLivre(veterinario, dataHora);
-        garantirPetSemConsultaNoDia(pet, dataHora.toLocalDate());
+        garantirPetSemConsultaNoDia(pet, dataHora.toLocalDate(), null);
 
         Consulta consulta = consultaRepository.save(Consulta.solicitar(pet, veterinario, dataHora,
                 request.getModalidade(), request.getMotivo(), LocalDateTime.now(relogio)));
@@ -105,15 +105,49 @@ public class AgendamentoService {
                         consulta.getPet().getNome(), consulta.getDataHora().format(DATA_HORA)));
     }
 
+    public void remarcar(Long usuarioTutorId, Long consultaId, LocalDateTime novaDataHora) {
+        Consulta consulta = consultaService.buscarDoTutor(usuarioTutorId, consultaId);
+        politica.validar(novaDataHora);
+        garantirHorarioLivre(consulta.getVeterinario(), novaDataHora);
+        garantirPetSemConsultaNoDia(consulta.getPet(), novaDataHora.toLocalDate(), consulta.getId());
+        consulta.remarcar(novaDataHora, LocalDateTime.now(relogio));
+        notificacaoService.notificar(consulta.getVeterinario().getUsuario(),
+                "%s pediu para remarcar a consulta de %s para %s.".formatted(consulta.getPet().getTutor().getNome(),
+                        consulta.getPet().getNome(), novaDataHora.format(DATA_HORA)));
+    }
+
+    /** Pelo veterinário: uma solicitação é recusada; uma consulta confirmada é cancelada. */
+    public void desmarcarPeloVeterinario(Long usuarioVeterinarioId, Long consultaId, String justificativa) {
+        Consulta consulta = consultaService.buscarDoVeterinario(usuarioVeterinarioId, consultaId);
+        if (consulta.getStatus() == StatusConsulta.SOLICITADA) {
+            recusar(usuarioVeterinarioId, consultaId, justificativa);
+            return;
+        }
+        consulta.cancelarPeloVeterinario(justificativa);
+        notificarTutor(consulta, "A consulta de %s em %s foi cancelada pelo veterinário: %s".formatted(
+                consulta.getPet().getNome(), consulta.getDataHora().format(DATA_HORA), consulta.getJustificativa()));
+    }
+
+    public void excluir(Long usuarioTutorId, Long consultaId) {
+        Consulta consulta = consultaService.buscarDoTutor(usuarioTutorId, consultaId);
+        consulta.garantirQuePodeSerExcluida();
+        consultaRepository.delete(consulta);
+    }
+
     private void garantirHorarioLivre(Veterinario veterinario, LocalDateTime dataHora) {
         if (!horariosDisponiveis(veterinario.getId(), dataHora.toLocalDate()).contains(dataHora.toLocalTime())) {
             throw new RegraNegocioException("Este horário acabou de ser reservado. Escolha outro horário.");
         }
     }
 
-    private void garantirPetSemConsultaNoDia(Pet pet, LocalDate data) {
-        boolean jaPossuiConsulta = consultaRepository.existsByPet_IdAndStatusInAndDataHoraBetween(pet.getId(),
-                StatusConsulta.queOcupamAgenda(), data.atStartOfDay(), data.plusDays(1).atStartOfDay());
+    private void garantirPetSemConsultaNoDia(Pet pet, LocalDate data, Long consultaIgnorada) {
+        LocalDateTime inicio = data.atStartOfDay();
+        LocalDateTime fim = data.plusDays(1).atStartOfDay();
+        boolean jaPossuiConsulta = consultaIgnorada == null
+                ? consultaRepository.existsByPet_IdAndStatusInAndDataHoraBetween(pet.getId(),
+                        StatusConsulta.queOcupamAgenda(), inicio, fim)
+                : consultaRepository.existsByPet_IdAndIdNotAndStatusInAndDataHoraBetween(pet.getId(),
+                        consultaIgnorada, StatusConsulta.queOcupamAgenda(), inicio, fim);
         if (jaPossuiConsulta) {
             throw new RegraNegocioException(pet.getNome() + " já possui uma consulta ativa neste dia.");
         }

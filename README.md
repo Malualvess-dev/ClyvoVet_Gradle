@@ -20,6 +20,7 @@ Aplicação web em **Spring Boot 4 + Thymeleaf** que conecta **tutores** e **vet
 - [Banco Oracle (opcional)](#banco-oracle-opcional)
 - [Requisitos da entrega](#requisitos-da-entrega)
 - [Fluxos de negócio](#fluxos-de-negócio)
+- [API REST do aplicativo mobile](#api-rest-do-aplicativo-mobile)
 - [Arquitetura](#arquitetura)
 - [Testes](#testes)
 
@@ -147,6 +148,7 @@ As migrations comuns (`db/migration`) usam SQL compatível com Oracle e com o H2
 | V2 | `inserir_dados_do_grupo` — dados iniciais do script do grupo |
 | V3 | `ajustar_tabelas_para_a_aplicacao` — evolução de schema: nome e provedor do usuário, peso do pet, status SOLICITADA/RECUSADA, justificativa, reforço de vacina |
 | V4 | `complementar_dados_de_demonstracao` — raças comuns e reforços de vacina |
+| V5 | `observacoes_do_pet_para_o_aplicativo` — campo de observações do pet usado pelo app mobile |
 | R__ (só Oracle) | packages `PKG_PETS_JSON(_API)`, `PKG_RELATORIOS(_API)`, `PKG_AUDITORIA_COLEIRA` e trigger `TRG_AUDITORIA_COLEIRA` |
 
 O Hibernate **não** altera o schema (`ddl-auto=none`): o Flyway é o único responsável pela estrutura do banco.
@@ -162,6 +164,8 @@ O Hibernate **não** altera o schema (`ddl-auto=none`): o Flyway é o único res
 | `/cadastro/perfil/**` | Apenas contas com perfil pendente |
 | `/tutor/**` | Apenas `TUTOR` |
 | `/veterinario/**` | Apenas `VETERINARIO` |
+| `POST /api/cadastro/**` | Público (cadastro pelo app) |
+| `/api/**` | `TUTOR` ou `VETERINARIO`, via HTTP Basic, sem sessão |
 | Demais rotas | Usuário autenticado |
 
 - Sessão no servidor, sem token para copiar ou colar; senhas com BCrypt; proteção CSRF em todos os formulários.
@@ -213,17 +217,51 @@ Regras (`AtendimentoService`, `Consulta` e `Vacina`):
 - A próxima dose precisa ser posterior à aplicação e exige o nome da vacina.
 - O tutor passa a ver o **histórico clínico** e a **carteira de vacinação** do pet; o painel mostra os reforços previstos para os próximos 30 dias.
 
+## API REST do aplicativo mobile
+
+O app **SuperVet** (React Native/Expo) usa este mesmo backend no lugar do Firebase: as contas, pets e
+consultas criados no app aparecem no site e vice-versa, porque os dois gravam nas mesmas tabelas do Oracle.
+
+- Cadeia de segurança própria para `/api/**` (`SecurityConfig.filtroDaApi`): **HTTP Basic** com o e-mail e a senha da conta (BCrypt), **sem sessão** e sem CSRF; respostas 401/403 em JSON e **CORS** liberado só para `/api/**` (app rodando no navegador).
+- As regras são as mesmas do site: os controllers da API chamam `AgendamentoService`, `AtendimentoService` e a entidade `Consulta`. Erros voltam como `{"status", "mensagem", "campos"}` (`TratamentoDeErrosDaApi`).
+- O tutor só acessa os próprios pets e consultas; ações exclusivas de um perfil devolvem 403.
+
+| Método e rota | Perfil | O que faz |
+|---|---|---|
+| `GET /api/me` | Todos | Perfil do usuário logado (usado no login do app) |
+| `POST /api/cadastro/tutor` · `POST /api/cadastro/veterinario` | Público | Cria a conta (TB_USUARIO) e o perfil (TB_TUTOR / TB_VETERINARIO) |
+| `GET /api/pets` | Todos | Tutor: os seus pets · Veterinário: todos os pacientes |
+| `POST /api/pets` · `PUT /api/pets/{id}` · `DELETE /api/pets/{id}` | Tutor | Cadastra, edita e exclui (só pets sem histórico) |
+| `GET /api/racas` | Todos | Raças e espécies do banco |
+| `GET /api/veterinarios` · `GET /api/veterinarios/{id}/horarios?data=aaaa-mm-dd` | Todos | Veterinários e horários livres |
+| `GET /api/consultas` | Todos | Tutor: consultas dos pets · Veterinário: a própria agenda |
+| `POST /api/consultas` | Tutor | Solicita consulta |
+| `POST /api/consultas/{id}/remarcacao` | Tutor | Remarca (volta para "solicitada") |
+| `POST /api/consultas/{id}/cancelamento` | Ambos | Tutor cancela · Veterinário recusa a solicitação ou cancela a confirmada |
+| `POST /api/consultas/{id}/confirmacao` | Veterinário | Confirma |
+| `POST /api/consultas/{id}/atendimento` | Veterinário | Finaliza: a observação vira o diagnóstico do prontuário |
+| `DELETE /api/consultas/{id}` | Tutor | Exclui consulta cancelada ou recusada |
+
+Teste rápido (PowerShell, com a aplicação rodando):
+
+```powershell
+curl.exe -u joao.tutor@clyvo.com:Clyvo@2026 http://localhost:8080/api/me
+curl.exe -u joao.tutor@clyvo.com:Clyvo@2026 http://localhost:8080/api/pets
+```
+
 ## Arquitetura
 
 ```
 src/main/java/br/com/fiap/clyvovet
 ├── config          # Relógio da aplicação (fuso America/Sao_Paulo)
 ├── controller      # Controllers MVC
+│   ├── api/          # API REST do app mobile (/api/**) e erros em JSON
 │   ├── tutor/        # PetController, TutorConsultaController, TutorPainelController
 │   ├── veterinario/  # VeterinarioAgendaController, AtendimentoController, BancoDeDadosController
 │   ├── conta/        # Lembretes (TB_AGENDA), documentos (TB_ANEXO) e endereço (TB_ENDERECO)
 │   └── advice/       # Dados globais das telas e tratamento de erros
 ├── dto
+│   ├── api         # Requests e responses da API REST (records)
 │   ├── request     # Dados recebidos dos formulários, com Bean Validation (*Request)
 │   └── response    # Dados enviados às telas (*Response, records imutáveis)
 ├── exception       # RegraNegocioException, RecursoNaoEncontradoException
@@ -255,9 +293,10 @@ Decisões de projeto:
 ./gradlew test
 ```
 
-75 testes:
+94 testes:
 
 - `ConsultaTest`, `RegrasDoModeloTest` e `PoliticaDeAgendamentoTest` — regras de domínio (transições, 24h, horários, domingo, retorno, vacinas, alerta da coleira, conversão dos status para o modelo do grupo).
 - `FluxosDeNegocioTest` — os dois fluxos completos sobre o banco do grupo criado pelo Flyway, conferindo os valores gravados nas tabelas.
 - `MinhaContaTest` — cadastro, alteração e exclusão de lembretes, documentos, endereço e leituras da coleira.
+- `ApiDoAplicativoTest` — a API do app mobile: login HTTP Basic (401 em JSON), cadastro, CRUD de pets, horários livres e o fluxo completo pelo app (solicitar → confirmar → remarcar → finalizar), além de recusa, cancelamento, exclusão e bloqueios por perfil.
 - `PaginasESegurancaTest` — todas as páginas carregam, cada perfil é bloqueado na área do outro (403), dados de outro usuário não são encontrados (404), CSRF e validações dos formulários.
