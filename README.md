@@ -2,6 +2,16 @@
 
 Aplicação web em **Spring Boot 4 + Thymeleaf** que conecta **tutores** e **veterinários**: o tutor cadastra seus pets e solicita consultas; o veterinário confirma ou recusa, registra o atendimento (prontuário e vacinas) e o tutor acompanha o histórico clínico e os reforços de vacina — com notificações automáticas em cada etapa.
 
+O mesmo backend também atende o **app mobile SuperVet** por uma API REST: site e app usam as mesmas contas e o mesmo banco Oracle.
+
+| | |
+|---|---|
+| 🌐 **Aplicação online** | **https://clyvovet-rm561802.azurewebsites.net** |
+| 🎬 **Vídeo de apresentação** | _(link do YouTube)_ |
+| 📱 **App mobile (SuperVet)** | _(link do repositório mobile)_ |
+| ☁️ **Hospedagem** | Azure App Service (Linux, Java 21) |
+| 🗄️ **Banco de dados** | Oracle da FIAP — modelo do grupo (20 tabelas), versionado com Flyway |
+
 ## Integrantes
 
 | Nome | RM |
@@ -13,16 +23,31 @@ Aplicação web em **Spring Boot 4 + Thymeleaf** que conecta **tutores** e **vet
 
 ## Sumário
 
+- [O problema e a solução](#o-problema-e-a-solução)
 - [Tecnologias](#tecnologias)
-- [Como executar](#como-executar)
+- [Acessar a aplicação online](#acessar-a-aplicação-online)
+- [Como executar localmente](#como-executar-localmente)
 - [Contas de demonstração](#contas-de-demonstração)
 - [Login com Google e GitHub (OAuth2)](#login-com-google-e-github-oauth2)
-- [Banco Oracle (opcional)](#banco-oracle-opcional)
+- [Banco Oracle](#banco-oracle)
+- [Deploy na Azure](#deploy-na-azure)
 - [Requisitos da entrega](#requisitos-da-entrega)
 - [Fluxos de negócio](#fluxos-de-negócio)
 - [API REST do aplicativo mobile](#api-rest-do-aplicativo-mobile)
+- [Evidências](#evidências)
 - [Arquitetura](#arquitetura)
+- [Integração com as demais disciplinas](#integração-com-as-demais-disciplinas)
 - [Testes](#testes)
+
+## O problema e a solução
+
+O desafio proposto pela **Clyvo Vet** é a jornada contínua de cuidado do pet. Hoje, o histórico de um animal fica espalhado entre clínicas, papéis e a memória do tutor: consultas são marcadas por telefone, vacinas são esquecidas e o veterinário atende sem saber o que aconteceu antes.
+
+O ClyvoVet reúne essa jornada em um só lugar:
+
+- **Para o tutor:** cadastra os pets, vê só os horários realmente livres do veterinário, acompanha o status da consulta, o histórico clínico, os reforços de vacina previstos e as leituras da coleira inteligente.
+- **Para o veterinário:** recebe as solicitações, confirma ou recusa com justificativa e registra o atendimento (prontuário, prescrição e vacinas) já vendo o histórico do pet.
+- **Para os dois:** uma notificação automática a cada mudança, no site ou no app.
 
 ## Tecnologias
 
@@ -32,11 +57,17 @@ Aplicação web em **Spring Boot 4 + Thymeleaf** que conecta **tutores** e **vet
 | Framework | Spring Boot 4.0 (Web MVC, Data JPA, Validation) |
 | Frontend | Thymeleaf (renderizado no servidor) + CSS próprio |
 | Segurança | Spring Security 7 — login por sessão (formulário) + OAuth2 (Google/GitHub) |
-| Banco | H2 em memória (padrão, modo Oracle) ou Oracle |
-| Versionamento do banco | Flyway |
+| API para o app mobile | REST + JSON em `/api/**`, autenticação HTTP Basic sem sessão |
+| Banco | Oracle da FIAP (produção) · H2 em memória, modo Oracle (desenvolvimento e testes) |
+| Versionamento do banco | Flyway (migrations versionadas + packages e trigger do grupo) |
+| Nuvem | Azure App Service (Linux) criado via Azure CLI |
 | Testes | JUnit 5, AssertJ, Spring Security Test, MockMvc |
 
-## Como executar
+## Acessar a aplicação online
+
+Acesse **https://clyvovet-rm561802.azurewebsites.net** e entre com uma das [contas de demonstração](#contas-de-demonstração). A versão online usa o **Oracle da FIAP**, então os dados cadastrados permanecem entre os acessos — e são os mesmos que o app mobile mostra.
+
+## Como executar localmente
 
 Pré-requisito: **JDK 21**. Não é preciso instalar Gradle nem banco de dados.
 
@@ -74,10 +105,12 @@ O login social é ativado **apenas se as credenciais estiverem configuradas** po
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google Cloud Console → APIs e serviços → Credenciais → ID do cliente OAuth |
 | `GITHUB_CLIENT_ID` / `GITHUB_CLIENT_SECRET` | GitHub → Settings → Developer settings → OAuth Apps |
 
-URLs de callback para cadastrar nos provedores:
+URLs de callback cadastradas nos provedores:
 
-- Google: `http://localhost:8080/login/oauth2/code/google`
-- GitHub: `http://localhost:8080/login/oauth2/code/github`
+| Provedor | Local | Azure |
+|---|---|---|
+| Google | `http://localhost:8080/login/oauth2/code/google` | `https://clyvovet-rm561802.azurewebsites.net/login/oauth2/code/google` |
+| GitHub | `http://localhost:8080/login/oauth2/code/github` | `https://clyvovet-rm561802.azurewebsites.net/login/oauth2/code/github` |
 
 Exemplo (PowerShell):
 
@@ -89,14 +122,16 @@ $env:GITHUB_CLIENT_SECRET="seu-client-secret"
 
 No primeiro acesso via Google/GitHub a conta é criada automaticamente e o usuário escolhe o perfil (tutor ou veterinário) antes de acessar o sistema.
 
+> O app do Google está em modo de teste: o login com Google funciona apenas para os e-mails cadastrados como usuários de teste. O login com GitHub e o login por e-mail e senha funcionam para qualquer pessoa.
+
 ## Banco Oracle
 
 A aplicação usa o **mesmo banco relacional da disciplina de Banco de Dados**: as 20 tabelas, as sequences, os dados iniciais, os packages e o trigger do grupo. Para usar Oracle, ative o perfil `oracle` e informe a conexão por variáveis de ambiente:
 
 ```powershell
 $env:SPRING_PROFILES_ACTIVE="oracle"
-$env:DB_URL="jdbc:oracle:thin:@host:1521:ORCL"
-$env:DB_USERNAME="seu_usuario"
+$env:DB_URL="jdbc:oracle:thin:@oracle.fiap.com.br:1521:ORCL"
+$env:DB_USERNAME="rmXXXXXX"
 $env:DB_PASSWORD="sua_senha"
 ./gradlew bootRun
 ```
@@ -130,6 +165,32 @@ As migrations comuns (`db/migration`) usam SQL compatível com Oracle e com o H2
 | `TB_ANEXO` | Documentos do usuário |
 | `TB_ENDERECO`, `TB_BAIRRO`, `TB_CIDADE`, `TB_ESTADO` | Endereço do usuário |
 | `TB_LOG_ERRO` | Erros das procedures |
+
+## Deploy na Azure
+
+Os recursos foram criados via **Azure CLI** pelo script [`infra/criar-recursos-azure.ps1`](infra/criar-recursos-azure.ps1):
+
+| Recurso | Nome | Detalhes |
+|---|---|---|
+| Grupo de recursos | `rg-clyvovet` | |
+| Plano do App Service | `plan-clyvovet` | Linux, SKU B1, região East US |
+| Web App | `clyvovet-rm561802` | Java 21, HTTPS obrigatório, Always On |
+
+O script também configura as variáveis de ambiente do Web App (perfil `oracle`, conexão com o banco e credenciais do OAuth2), lendo os segredos da sessão do terminal — nada sensível fica no repositório.
+
+Publicação da aplicação:
+
+```powershell
+az login
+./gradlew clean bootJar
+az webapp deploy --resource-group rg-clyvovet --name clyvovet-rm561802 --src-path build/libs/clyvovet-1.0.0.jar --type jar
+```
+
+```
+Navegador ──► https://clyvovet-rm561802.azurewebsites.net ──┐
+                                                            ├──► Azure App Service (Spring Boot) ──► Oracle FIAP
+App SuperVet ──► /api/** (JSON, HTTP Basic) ────────────────┘        (clyvovet-rm561802)          (20 tabelas do grupo)
+```
 
 ## Requisitos da entrega
 
@@ -210,7 +271,7 @@ CONFIRMADA ──► Veterinário registra o atendimento ──► CONCLUIDA
                   └─ notifica o tutor
 ```
 
-Regras (`AtendimentoService`, `Consulta` e `Vacina`):
+Regras (`AtendimentoService`, `Consulta`, `Prontuario` e `HistoricoSaude`):
 
 - Só consultas **confirmadas** podem ser atendidas, e somente a partir do dia marcado.
 - Só o veterinário responsável pela consulta pode registrá-la.
@@ -247,6 +308,32 @@ Teste rápido (PowerShell, com a aplicação rodando):
 ```powershell
 curl.exe -u joao.tutor@clyvo.com:Clyvo@2026 http://localhost:8080/api/me
 curl.exe -u joao.tutor@clyvo.com:Clyvo@2026 http://localhost:8080/api/pets
+```
+
+## Evidências
+
+As imagens ficam em [`docs/evidencias`](docs/evidencias).
+
+| # | O que comprova | Evidência |
+|---|---|---|
+| 1 | Recursos criados na Azure via CLI | ![Recursos no portal](docs/evidencias/01-recursos-azure.png) |
+| 2 | Web App com o perfil `oracle` e variáveis protegidas | ![Variáveis do Web App](docs/evidencias/02-variaveis-webapp.png) |
+| 3 | Deploy concluído com sucesso | ![Deploy](docs/evidencias/03-deploy.png) |
+| 4 | Flyway aplicando as migrations no Oracle | ![Flyway](docs/evidencias/04-flyway-oracle.png) |
+| 5 | Tabelas do modelo do grupo no Oracle | ![Tabelas](docs/evidencias/05-tabelas-oracle.png) |
+| 6 | Aplicação online funcionando | ![Login online](docs/evidencias/06-app-online.png) |
+| 7 | Tela **Banco de dados** chamando as procedures do grupo | ![Procedures](docs/evidencias/07-procedures.png) |
+| 8 | App mobile listando os pets pela API da Azure | ![App mobile](docs/evidencias/08-app-mobile.png) |
+| 9 | Consulta criada no app aparecendo no site | ![Integração](docs/evidencias/09-app-e-site.png) |
+
+Para conferir no Oracle um dado criado pelo site ou pelo app:
+
+```sql
+SELECT c.ID_CONSULTA, c.DATA_HORA, c.STATUS, p.NOME AS PET, v.NOME AS VETERINARIO
+FROM TB_CONSULTA c
+JOIN TB_PET p         ON p.ID_PET = c.ID_PET
+JOIN TB_VETERINARIO v ON v.ID_VETERINARIO = c.ID_VETERINARIO
+ORDER BY c.ID_CONSULTA DESC;
 ```
 
 ## Arquitetura
@@ -287,10 +374,21 @@ Decisões de projeto:
 - **Data e hora testáveis:** os serviços recebem um `Clock` injetado, o que permite testar regras de horário de forma determinística.
 - **Erros de negócio tratados em um único lugar:** `TratamentoDeErrosAdvice` mostra a mensagem na própria página de origem.
 
+## Integração com as demais disciplinas
+
+| Disciplina | Como foi aplicada no ClyvoVet | Evidência |
+|---|---|---|
+| **Java Advanced** | Aplicação Spring Boot com Thymeleaf, Flyway, Spring Security (dois perfis + OAuth2), dois fluxos de negócio e API REST para o app | Este repositório |
+| **Mastering Relational and Non-Relational Database** | O Java usa o **modelo relacional do grupo** (20 tabelas) e chama os packages, a função e o trigger em PL/SQL | [`db/migration`](src/main/resources/db/migration) · [`db/oracle`](src/main/resources/db/oracle) · _(link dos scripts do grupo)_ |
+| **DevOps Tools & Cloud Computing** | Recursos criados via **Azure CLI** e aplicação publicada no **Azure App Service** | [`infra/criar-recursos-azure.ps1`](infra/criar-recursos-azure.ps1) · _(link do Azure DevOps)_ |
+| **Compliance, Quality Assurance & Tests** | 94 testes automatizados de domínio, fluxos, segurança e API (JUnit 5 + MockMvc) | [`src/test`](src/test) · _(link do Azure Boards)_ |
+| **Mobile Application Development** | App **SuperVet** (React Native/Expo) consumindo a API REST deste backend no lugar do Firebase | [API REST do aplicativo mobile](#api-rest-do-aplicativo-mobile) · _(link do repositório mobile)_ |
+| **Disruptive Architectures: IoT, IoB & Generative IA** | _(descrever o componente de IA)_ · Leituras da **coleira inteligente** (TB_COLEIRA) com alerta de batimentos | _(link do repositório de IA)_ |
+
 ## Testes
 
 ```bash
-./gradlew test
+./gradlew test             # Windows: gradlew.bat test
 ```
 
 94 testes:

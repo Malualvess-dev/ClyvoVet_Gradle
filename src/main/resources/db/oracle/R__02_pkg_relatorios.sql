@@ -297,8 +297,8 @@ BEGIN
     -- Exibe o total geral, ao final de toda a listagem
 
     DBMS_OUTPUT.PUT_LINE(
-        RPAD('Total Geral', 10) ||
-        RPAD(' ', 10) ||
+        -- [Java] 'Total Geral' tem 11 letras: ocupa as duas primeiras colunas (10 + 10) para não ser cortado.
+        RPAD('Total Geral', 20) ||
         RPAD(TO_CHAR(v_total_geral, 'FM9999990.00'), 18)
     );
 
@@ -446,8 +446,8 @@ CREATE OR REPLACE PACKAGE BODY PKG_RELATORIOS_API AS
         EXIBIR_SUBTOTAL;
 
         ADICIONAR_LINHA(
-            RPAD('Total Geral', 10) ||
-            RPAD(' ', 10) ||
+            -- [Java] 'Total Geral' tem 11 letras: ocupa as duas primeiras colunas (10 + 10) para não ser cortado.
+            RPAD('Total Geral', 20) ||
             RPAD(TO_CHAR(v_total_geral, 'FM9999990.00'), 18)
         );
 
