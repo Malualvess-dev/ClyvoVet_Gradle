@@ -7,8 +7,8 @@ O mesmo backend também atende o **app mobile SuperVet** por uma API REST: site 
 | | |
 |---|---|
 | 🌐 **Aplicação online** | **https://clyvovet-rm561802.azurewebsites.net** |
-| 🎬 **Vídeo de apresentação** | _(link do YouTube)_ |
-| 📱 **App mobile (SuperVet)** | _(link do repositório mobile)_ |
+| 🎬 **Vídeo de apresentação** | **https://youtu.be/61hxvMsL6PY** |
+| 📱 **App mobile (SuperVet)** | https://github.com/FIAP-MOBILE-2026-Fevereiro/2tdspw-challenge-proj-app-pet |
 | ☁️ **Hospedagem** | Azure App Service (Linux, Java 21) |
 | 🗄️ **Banco de dados** | Oracle da FIAP — modelo do grupo (20 tabelas), versionado com Flyway |
 
@@ -312,19 +312,15 @@ curl.exe -u joao.tutor@clyvo.com:Clyvo@2026 http://localhost:8080/api/pets
 
 ## Evidências
 
-As imagens ficam em [`docs/evidencias`](docs/evidencias).
+Todas as evidências estão no **[vídeo de apresentação](https://youtu.be/61hxvMsL6PY)**, gravado sobre a aplicação online:
 
-| # | O que comprova | Evidência |
-|---|---|---|
-| 1 | Recursos criados na Azure via CLI | ![Recursos no portal](docs/evidencias/01-recursos-azure.png) |
-| 2 | Web App com o perfil `oracle` e variáveis protegidas | ![Variáveis do Web App](docs/evidencias/02-variaveis-webapp.png) |
-| 3 | Deploy concluído com sucesso | ![Deploy](docs/evidencias/03-deploy.png) |
-| 4 | Flyway aplicando as migrations no Oracle | ![Flyway](docs/evidencias/04-flyway-oracle.png) |
-| 5 | Tabelas do modelo do grupo no Oracle | ![Tabelas](docs/evidencias/05-tabelas-oracle.png) |
-| 6 | Aplicação online funcionando | ![Login online](docs/evidencias/06-app-online.png) |
-| 7 | Tela **Banco de dados** chamando as procedures do grupo | ![Procedures](docs/evidencias/07-procedures.png) |
-| 8 | App mobile listando os pets pela API da Azure | ![App mobile](docs/evidencias/08-app-mobile.png) |
-| 9 | Consulta criada no app aparecendo no site | ![Integração](docs/evidencias/09-app-e-site.png) |
+- Recursos na Azure (`rg-clyvovet`) e o Web App rodando com o perfil `oracle`.
+- Fluxo 1 no site: o tutor solicita a consulta, o veterinário confirma e os dois recebem notificações.
+- Fluxo 2 no site: atendimento com prontuário, prescrição e vacina, visto depois pela tutora.
+- Segurança: acesso negado à área do outro perfil e login com Google/GitHub.
+- Tela **Banco de dados**: procedures do grupo executadas pela aplicação (JSON dos pets, relatório da coleira e trigger de auditoria).
+- App SuperVet chamando a API da Azure (aba Network) e a consulta criada no app aparecendo no site.
+- SQL Developer mostrando os registros gravados no Oracle.
 
 Para conferir no Oracle um dado criado pelo site ou pelo app:
 
@@ -379,11 +375,11 @@ Decisões de projeto:
 | Disciplina | Como foi aplicada no ClyvoVet | Evidência |
 |---|---|---|
 | **Java Advanced** | Aplicação Spring Boot com Thymeleaf, Flyway, Spring Security (dois perfis + OAuth2), dois fluxos de negócio e API REST para o app | Este repositório |
-| **Mastering Relational and Non-Relational Database** | O Java usa o **modelo relacional do grupo** (20 tabelas) e chama os packages, a função e o trigger em PL/SQL | [`db/migration`](src/main/resources/db/migration) · [`db/oracle`](src/main/resources/db/oracle) · _(link dos scripts do grupo)_ |
-| **DevOps Tools & Cloud Computing** | Recursos criados via **Azure CLI** e aplicação publicada no **Azure App Service** | [`infra/criar-recursos-azure.ps1`](infra/criar-recursos-azure.ps1) · _(link do Azure DevOps)_ |
-| **Compliance, Quality Assurance & Tests** | 94 testes automatizados de domínio, fluxos, segurança e API (JUnit 5 + MockMvc) | [`src/test`](src/test) · _(link do Azure Boards)_ |
-| **Mobile Application Development** | App **SuperVet** (React Native/Expo) consumindo a API REST deste backend no lugar do Firebase | [API REST do aplicativo mobile](#api-rest-do-aplicativo-mobile) · _(link do repositório mobile)_ |
-| **Disruptive Architectures: IoT, IoB & Generative IA** | _(descrever o componente de IA)_ · Leituras da **coleira inteligente** (TB_COLEIRA) com alerta de batimentos | _(link do repositório de IA)_ |
+| **Mastering Relational and Non-Relational Database** | O Java usa o **modelo relacional do grupo** (20 tabelas) e chama os packages, a função e o trigger em PL/SQL | [`db/migration`](src/main/resources/db/migration) · [`db/oracle`](src/main/resources/db/oracle) |
+| **DevOps Tools & Cloud Computing** | Recursos criados via **Azure CLI** e aplicação publicada no **Azure App Service** | [`infra/criar-recursos-azure.ps1`](infra/criar-recursos-azure.ps1) |
+| **Compliance, Quality Assurance & Tests** | 94 testes automatizados de domínio, fluxos, segurança e API (JUnit 5 + MockMvc) | [`src/test`](src/test) |
+| **Mobile Application Development** | App **SuperVet** (React Native/Expo) consumindo a API REST deste backend no lugar do Firebase | [API REST do aplicativo mobile](#api-rest-do-aplicativo-mobile) · [Repositório mobile](https://github.com/FIAP-MOBILE-2026-Fevereiro/2tdspw-challenge-proj-app-pet) |
+| **Disruptive Architectures: IoT, IoB & Generative IA** | Leituras da **coleira inteligente** (TB_COLEIRA) com alerta de batimentos | [Tela da coleira no prontuário do pet](#fluxos-de-negócio) |
 
 ## Testes
 
